@@ -10,8 +10,18 @@
 |---|---|
 | معماری سیستم (نسخهٔ ۲.۱) | ✅ انجام‌شده |
 | طراحی دیتابیس (نسخهٔ ۴) | ✅ آمادهٔ Schema Freeze |
-| مرجع بصری UI/UX | ✅ موجود |
-| کدنویسی MVP | ⏳ شروع‌نشده — فاز ۱: Foundation |
+| مرجع بصری UI/UX + پروتوتایپ تعاملی | ✅ تاییدشده |
+| فاز ۱ — Foundation (پروژهٔ ماژولار + دیزاین‌سیستم) | ✅ کامل — [گزارش فاز](docs/phase-reports/01-foundation.md) |
+| فاز ۲ تا ۱۰ |  منتظر تایید مالک برای شروع فاز ۲ |
+
+## بیلد
+
+```bash
+scripts/setup-toolchain.sh   # JDK 17 + Gradle + Android SDK (idempotent)
+scripts/build-debug.sh       # app-debug.apk
+```
+
+> نکته: در محیط‌های با RAM ≤ 1GB، `build-debug.sh`.merge سنگین dex خارجی را با D8 مستقل انجام می‌دهد (مستند در گزارش فاز ۱).
 
 ## اسکوپ MVP
 
