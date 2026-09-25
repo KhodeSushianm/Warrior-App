@@ -12,7 +12,8 @@
 | طراحی دیتابیس (نسخهٔ ۴) | ✅ آمادهٔ Schema Freeze |
 | مرجع بصری UI/UX + پروتوتایپ تعاملی | ✅ تاییدشده |
 | فاز ۱ — Foundation (پروژهٔ ماژولار + دیزاین‌سیستم) | ✅ کامل — [گزارش فاز](docs/phase-reports/01-foundation.md) |
-| فاز ۲ تا ۱۰ |  منتظر تایید مالک برای شروع فاز ۲ |
+| فاز ۲ — Database (اسکیما + DAOها + تست‌ها) | ✅ کامل + **Schema Freeze** — [گزارش فاز](docs/phase-reports/02-database.md) |
+| فاز ۳ تا ۱۰ |  منتظر تایید مالک برای شروع فاز ۳ |
 
 ## بیلد
 
@@ -22,6 +23,7 @@ scripts/build-debug.sh       # app-debug.apk
 ```
 
 > نکته: در محیط‌های با RAM ≤ 1GB، `build-debug.sh`.merge سنگین dex خارجی را با D8 مستقل انجام می‌دهد (مستند در گزارش فاز ۱).
+> تست‌های Robolectric در همان محیط‌ها با `scripts/test-lowram.sh` (JVM مستقل) اجرا می‌شوند (مستند در گزارش فاز ۲).
 
 ## اسکوپ MVP
 
@@ -65,7 +67,9 @@ Foundation ← Database ← Authentication ← Workout Logging ← History
 
 ## اجرای پروژه
 
-فعلاً کدی وجود ندارد؛ با شروع فاز ۱ (ساخت پروژهٔ Android با Compose/Hilt/Room) این بخش تکمیل می‌شود.
+فازهای ۱ و ۲ کامل شده‌اند؛ اسکیمای Room نسخهٔ ۱ Freeze شده است
+(`data/local/schemas/com.warrior.data.local.database.WarriorDatabase/1.json`).
+کد فازهای بعد مطابق `EXECUTION-PLAN.md` اضافه می‌شود.
 
 ## مجوز
 

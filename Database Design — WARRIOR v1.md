@@ -178,6 +178,8 @@ DB Constraint خط دفاع آخر است.
 
 همین قوانین باید در **Domain Use Case** نیز enforce شوند.
 
+> **یادداشت پیاده‌سازی (فاز ۲):** Room نمی‌تواند `CHECK` clause را در DDL صادر کند؛ بنابراین «خط دفاع آخر» در لایهٔ داده با **گاردهای `init` روی Entityها** پیاده‌سازی شده است: هر ساخت نمونه (هم در مسیر write و هم read) مقادیر نامعتبر را با `IllegalArgumentException` رد می‌کند. معنای قوانین بدون تغییر است و در `WarriorDatabaseTest` تست دارد.
+
 ```
 UI Validation
       ↓
@@ -467,12 +469,16 @@ abstract class TrainingSessionDao {
 
     @Query("""
         SELECT COALESCE(
-            SUM(duration), 0
+            SUM(wa.duration), 0
         )
-        FROM workout_activities
-        WHERE sessionId = :sessionId
+        FROM workout_activities wa
+        INNER JOIN training_sessions ts
+            ON wa.sessionId = ts.id
+        WHERE wa.sessionId = :sessionId
+        AND ts.userId = :userId
     """)
-    abstract suspend fun getTotalDuration(
+    abstract suspend fun getSessionTotalDuration(
+        userId: Long,
         sessionId: Long
     ): Long
 
@@ -992,4 +998,4 @@ rounds
 └── updatedAt
 ```
 
-**Status: Database Design v4 (Consistency Pass) — Ready for Schema Freeze.**
+**Status: Database Design v4 — SCHEMA FROZEN at Phase 2 (snapshot: `data/local/schemas/com.warrior.data.local.database.WarriorDatabase/1.json`). Any future change = explicit Migration + test (Architecture Rule 11).**
