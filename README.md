@@ -42,6 +42,7 @@ Composable → ViewModel → Use Case → Repository → Room DAO → SQLite
 |---|---|
 | [warrior-architecture.md](warrior-architecture.md) | معماری سیستم و تعریف محصول — نسخهٔ ۲.۱ |
 | [Database Design — WARRIOR v1.md](Database%20Design%20%E2%80%94%20WARRIOR%20v1.md) | اسکیمای Room، DAOها، تراکنش‌ها، Migration — نسخهٔ ۴ |
+| [EXECUTION-PLAN.md](EXECUTION-PLAN.md) | نقشهٔ اجرای فازبندی‌شده با دروازهٔ تایید — نسخهٔ ۱.۰ |
 | [APP UI-UX DESIGN REFFERENCE.jpg](APP%20UI-UX%20DESIGN%20REFFERENCE.jpg) | مرجع سبک بصری (تم تیره) — نه spec صفحه‌به‌صفحه |
 
 ## نقشهٔ راه توسعهٔ MVP
