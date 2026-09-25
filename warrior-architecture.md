@@ -1,6 +1,6 @@
 # WARRIOR — System Architecture
 
-> نسخه: 2.0 (Revised)
+> نسخه: 2.1 (Consistency Pass)
 > وضعیت: Architecture / Product Definition
 > پلتفرم: Android
 > مدل اجرا: Completely Offline / Local-First
@@ -12,13 +12,27 @@
 
 این نسخه روی معماری قبلی ساخته شده و مسائل زیر رو که در نسخه اول مبهم بودن، صریح کرده:
 
-1. **Password Hashing** — الگوریتم و پارامترهای دقیق مشخص شده (بخش ۲۱).
-2. **Transaction Strategy** — نحوه‌ی دقیق ذخیره‌ی Session + Activities + Rounds به‌صورت atomic (بخش ۱۹).
-3. **Migration Strategy** — رویکرد مشخص برای Room migrations به‌جای destructive fallback (بخش ۲۰).
-4. **Multi-Account روی یک دستگاه** — صراحتاً مشخص شده که چند اکانت محلی روی یک گوشی پشتیبانی می‌شه یا نه (بخش ۲۲).
+1. **Password Hashing** — الگوریتم و پارامترهای دقیق مشخص شده (بخش ۱۴.۱).
+2. **Transaction Strategy** — نحوه‌ی دقیق ذخیره‌ی Session + Activities + Rounds به‌صورت atomic (بخش ۱۵).
+3. **Migration Strategy** — رویکرد مشخص برای Room migrations به‌جای destructive fallback (بخش ۱۶).
+4. **Multi-Account روی یک دستگاه** — صراحتاً مشخص شده که چند اکانت محلی روی یک گوشی پشتیبانی می‌شه یا نه (بخش ۱۴.۳).
 5. **فشرده‌سازی** — بخش‌های تکراری (نمودارهای مفهومی مشابه) در نسخه اول ادغام شدن تا سند به‌عنوان یک مرجع کدنویسی، مستقیم‌تر و قابل‌استفاده‌تر باشه.
 
 بقیه‌ی ساختار (لایه‌بندی، مدل داده، Progress Engine، Development Order) بدون تغییر معنایی باقی مونده چون در نسخه اول درست بودن — فقط دقیق‌تر شدن.
+
+---
+
+## تغییرات نسخهٔ ۲.۱ (Consistency Pass)
+
+این نسخه تناقض‌ها و شکاف‌های بین همین سند و سند دیتابیس (`Database Design — WARRIOR v1.md`، نسخهٔ ۴) را رفع می‌کند:
+
+1. **حذف `totalDuration` از مدل TrainingSession** — مدت Session یک مقدار Derived است: `SUM(workout_activities.duration)` (سند دیتابیس، بخش‌های ۲ و ۸).
+2. **اصلاح ارجاع‌های شمارهٔ بخش‌ها** در مقدمهٔ بالا: هش پسورد → ۱۴.۱، تراکنش → ۱۵، Migration → ۱۶، Multi-Account → ۱۴.۳.
+3. **یکسان‌سازی `insertFullSession`** بین دو سند: یک DAO واحد با متدهای insert داخلی و ورودی `List<ActivityWithRounds>` به‌جای `Map<Int, List<RoundEntity>>` ایندکسی (بخش ۱۵.۲ و سند دیتابیس بخش ۱۴).
+4. **مرز هفته**: ثابت مرکزی `WeekStartDay` معرفی شد؛ پیش‌فرض MVP شنبه→جمعه مطابق عرف تقویم ایرانی، با سوئیچ تک‌خطی به ISO دوشنبه برای انتشار بین‌المللی (بخش ۱۳.۲).
+5. **افزودن `createdAt/updatedAt` به Round** برای یکنواختی audit و آماده‌سازی Sync آینده (بخش ۱۱.۴).
+6. **نگاشت مرجع بصری به فیچرهای MVP** (بخش ۷.۱): محتوای موکاپ فقط مرجع سبک است؛ تب چت موکاپ → Profile.
+7. **شفاف‌سازی مدل تهدید** هش پسورد در اپ آفلاین (بخش ۱۴.۵).
 
 ---
 
@@ -145,6 +159,14 @@ User Action → UI Event → ViewModel → Use Case → Repository → Database
 Compose UI ← UI State ← ViewModel ← Flow ─────────────────────────┘
 ```
 
+## 7.1 نگاشت مرجع بصری (UI-UX Reference) به MVP
+
+فایل `APP UI-UX DESIGN REFFERENCE.jpg` **مرجع سبک بصری** است (تم تیره، کارت‌های گوشه‌گرد، تایپوگرافی درشت اعداد، heatmap نقطه‌ای، bottom navigation)، نه spec صفحه‌به‌صفحه:
+
+- محتوای موکاپ متعلق به یک اپ بدنسازی عمومی است (lbs، «Volume lifted»، تقسیم عضلانی مثل Chest+tricep)؛ متریک‌های واقعی WARRIOR زمان تمرین، تعداد Round، شدت و Focus هستند و در طراحی جایگزین می‌شوند (مثلاً به‌جای «Volume lifted» → «Training Time این هفته»).
+- heatmap نقطه‌ای موکاپ برای نمایش روزهای تمرین ماهانه حفظ می‌شود.
+- Bottom navigation چهارتایی MVP: **Home | History | Progress | Profile**. آیکون «چت» موکاپ در MVP حذف می‌شود (Messaging یک Non-Goal است) و جای خود را به Profile می‌دهد.
+
 ---
 
 # 8. Domain Layer
@@ -231,13 +253,14 @@ userId
 date
 startedAt
 endedAt
-totalDuration
 overallIntensity
 overallFeeling
 notes
 createdAt
 updatedAt
 ```
+
+> `totalDuration` عمداً در مدل وجود ندارد: مدت Session یک مقدار Derived است و از `SUM(workout_activities.duration)` محاسبه می‌شود (سند دیتابیس، بخش‌های ۲ و ۱۸).
 
 ## 11.3 WorkoutActivity
 
@@ -267,6 +290,8 @@ duration
 restDuration
 intensity
 notes
+createdAt
+updatedAt
 ```
 
 ## 11.5 Workout Types (قابل توسعه)
@@ -306,7 +331,7 @@ Round.activityId          → WorkoutActivity.id    (ON DELETE CASCADE)
 `Session, Activity, Round, Intensity, Focus, Notes, Date, Duration`
 
 ## Derived Data (محاسبه‌شده)
-`Weekly Training Time, Session Count, Round Count, Average Intensity, Workout Distribution, Focus Distribution, Streak, Longest Session, Most Rounds`
+`Session Total Duration, Weekly Training Time, Session Count, Round Count, Average Intensity, Workout Distribution, Focus Distribution, Streak, Longest Session, Most Rounds`
 
 > اصل: Derived Data هرگز به‌صورت دستی توسط کاربر ثبت نمی‌شود.
 
@@ -324,7 +349,7 @@ Room → Training Data → Progress Engine → Metrics → Charts / Dashboard / 
 
 ## 13.2 Weekly Boundary
 
-هفته با یک Rule ثابت محاسبه می‌شود: **Monday → Sunday**. این Rule در یک محل مرکزی (مثلاً `WeekBoundaryProvider`) تعریف و در کل اپ یکسان استفاده می‌شود؛ هیچ Feature نباید boundary خودش را حساب کند.
+هفته با یک Rule ثابت محاسبه می‌شود: **شنبه → جمعه (Saturday → Friday)** مطابق عرف تقویم ایرانی برای مخاطب فارسی‌زبان MVP. این Rule فقط در یک محل مرکزی (`WeekBoundaryProvider` با ثابت `WeekStartDay = SATURDAY`) تعریف و در کل اپ یکسان استفاده می‌شود؛ هیچ Feature نباید boundary خودش را حساب کند. برای انتشار بین‌المللی، تغییر `WeekStartDay` به `MONDAY` (ISO 8601) یک تغییر تک‌خطی است و هیچ بخش دیگری لمس نمی‌شود.
 
 ## 13.3 Source of Truth
 
@@ -401,6 +426,10 @@ Logout یعنی پاک‌شدن این مقادیر، نه حذف داده‌ی 
 
 هر Query که داده‌ی کاربر را برمی‌گرداند، باید `userId` را در `WHERE` یا از طریق JOIN تا `TrainingSession.userId` رعایت کند. این قانون در DAO سطح امضای متد اجباری می‌شود (هر متد History/Progress پارامتر `userId` می‌گیرد)، نه به‌صورت توافق ضمنی.
 
+## 14.5 Threat Model (شفاف‌سازی)
+
+در یک اپ کاملاً آفلاین، هش پسورد عمدتاً در برابر دسترسی محلی/غیرمجاز به دیتابیس (مثلاً دستگاه root‌شده یا دسترسی فیزیکی) محافظت می‌کند و هویت کاربر را برای باز کردن اپ معتبر می‌سازد. اگر روزی حساسیت دادهٔ تمرین بالا برود یا اپ به سمت Export/Import برود، گزینهٔ تکمیلی رمزنگاری کل دیتابیس (مثل SQLCipher) بررسی می‌شود. این مورد خارج از اسکوپ MVP است و تصمیم فعلی را نقض نمی‌کند.
+
 ---
 
 # 15. Transaction Strategy (تکمیل‌شده)
@@ -414,36 +443,57 @@ Logout یعنی پاک‌شدن این مقادیر، نه حذف داده‌ی 
 تمام نوشتن‌های مرکب از طریق یک متد `@Transaction` در DAO یا Repository انجام می‌شوند، نه چند `insert` جدا از هم که از ViewModel صدا زده شوند:
 
 ```kotlin
+data class ActivityWithRounds(
+    val activity: WorkoutActivityEntity,
+    val rounds: List<RoundEntity> = emptyList(),
+)
+
 @Dao
 abstract class TrainingSessionDao {
 
     @Insert
-    abstract suspend fun insertSession(session: TrainingSessionEntity): Long
+    protected abstract suspend fun insertSession(
+        session: TrainingSessionEntity
+    ): Long
 
     @Insert
-    abstract suspend fun insertActivities(activities: List<WorkoutActivityEntity>): List<Long>
+    protected abstract suspend fun insertActivities(
+        activities: List<WorkoutActivityEntity>
+    ): List<Long>
 
     @Insert
-    abstract suspend fun insertRounds(rounds: List<RoundEntity>)
+    protected abstract suspend fun insertRounds(rounds: List<RoundEntity>)
 
     @Transaction
     open suspend fun insertFullSession(
         session: TrainingSessionEntity,
-        activities: List<WorkoutActivityEntity>,
-        roundsByActivityIndex: Map<Int, List<RoundEntity>>
+        activitiesWithRounds: List<ActivityWithRounds>,
     ): Long {
+
         val sessionId = insertSession(session)
+
         val activityIds = insertActivities(
-            activities.map { it.copy(sessionId = sessionId) }
+            activitiesWithRounds.map {
+                it.activity.copy(sessionId = sessionId)
+            }
         )
-        val allRounds = roundsByActivityIndex.flatMap { (index, rounds) ->
-            rounds.map { it.copy(activityId = activityIds[index]) }
+
+        // Room ترتیب IDهای برگشتی insertAll را مطابق ترتیب ورودی تضمین می‌کند،
+        // پس این جفت‌سازی داخلی و امن است.
+        val allRounds = activitiesWithRounds.flatMapIndexed { index, awr ->
+            awr.rounds.map { it.copy(activityId = activityIds[index]) }
         }
-        if (allRounds.isNotEmpty()) insertRounds(allRounds)
+
+        if (allRounds.isNotEmpty()) {
+            insertRounds(allRounds)
+        }
+
         return sessionId
     }
 }
 ```
+
+ورودی متد به‌جای `Map<Int, List<RoundEntity>>` (که یک قرارداد شکننده بر پایهٔ ایندکس بود و در دو سند هم متفاوت پیاده‌سازی شده بود) حالا `List<ActivityWithRounds>` است تا جفت‌بودن هر Activity با Roundهایش **ساختاری** باشد و نه قراردادی. سند دیتابیس (بخش ۱۴) نیز دقیقاً همین امضا را دارد.
 
 ## 15.3 قانون کلی
 

@@ -98,6 +98,8 @@ INDEX (sessionId)
 |`restDuration`|`Long`|NOT NULL, CHECK >= 0|
 |`intensity`|`Int`|NOT NULL, CHECK 1–10|
 |`notes`|`String?`|NULL|
+|`createdAt`|`Long`|NOT NULL — UTC epoch millis|
+|`updatedAt`|`Long`|NOT NULL — UTC epoch millis|
 
 **Indexes:**
 
@@ -305,14 +307,14 @@ UTC epoch millis corresponding to
 2026-09-25 00:00 Asia/Tehran
 ```
 
-Weekly calculation با Timezone فعلی دستگاه انجام می‌شود.
+Weekly calculation با Timezone فعلی دستگاه و مرز هفتهٔ مرکزی انجام می‌شود: ثابت `WeekStartDay` (پیش‌فرض `SATURDAY` → هفتهٔ شنبه تا جمعه؛ سند معماری بخش ۱۳.۲).
 
 ```
 Stored UTC timestamp
         ↓
 Device Local Timezone
         ↓
-Monday → Sunday
+Saturday → Friday
         ↓
 Weekly Progress
 ```
@@ -436,6 +438,11 @@ interface UserDao {
 # 14. Training Session DAO
 
 ```
+data class ActivityWithRounds(
+    val activity: WorkoutActivityEntity,
+    val rounds: List<RoundEntity> = emptyList(),
+)
+
 @Dao
 abstract class TrainingSessionDao {
 
@@ -474,6 +481,14 @@ abstract class TrainingSessionDao {
         session: TrainingSessionEntity
     ): Long
 
+    @Insert
+    protected abstract suspend fun insertActivities(
+        activities: List<WorkoutActivityEntity>
+    ): List<Long>
+
+    @Insert
+    protected abstract suspend fun insertRounds(rounds: List<RoundEntity>)
+
     @Update
     abstract suspend fun updateSession(
         session: TrainingSessionEntity
@@ -492,41 +507,25 @@ abstract class TrainingSessionDao {
     @Transaction
     open suspend fun insertFullSession(
         session: TrainingSessionEntity,
-        activities: List<WorkoutActivityEntity>,
-        roundsByActivityIndex:
-            Map<Int, List<RoundEntity>>,
-        activityDao: WorkoutActivityDao,
-        roundDao: RoundDao
+        activitiesWithRounds: List<ActivityWithRounds>,
     ): Long {
 
         val sessionId = insertSession(session)
 
-        val activitiesWithSession =
-            activities.map {
-                it.copy(sessionId = sessionId)
+        val activityIds = insertActivities(
+            activitiesWithRounds.map {
+                it.activity.copy(sessionId = sessionId)
             }
+        )
 
-        val activityIds =
-            activityDao.insertAll(
-                activitiesWithSession
-            )
+        // Room ترتیب IDهای برگشتی insertAll را مطابق ترتیب ورودی تضمین می‌کند،
+        // پس این جفت‌سازی داخلی و امن است.
+        val allRounds = activitiesWithRounds.flatMapIndexed { index, awr ->
+            awr.rounds.map { it.copy(activityId = activityIds[index]) }
+        }
 
-        val rounds =
-            roundsByActivityIndex.flatMap {
-                (activityIndex, activityRounds) ->
-
-                val activityId =
-                    activityIds[activityIndex]
-
-                activityRounds.map { round ->
-                    round.copy(
-                        activityId = activityId
-                    )
-                }
-            }
-
-        if (rounds.isNotEmpty()) {
-            roundDao.insertAll(rounds)
+        if (allRounds.isNotEmpty()) {
+            insertRounds(allRounds)
         }
 
         return sessionId
@@ -536,7 +535,7 @@ abstract class TrainingSessionDao {
 
 ### نکته معماری
 
-برای تمیزی بیشتر، در implementation واقعی بهتر است Transaction boundary در **یک DAO/Repository abstraction واحد** قرار بگیرد و DAOهای داخلی از طریق همان transaction context استفاده شوند؛ هدف این است که هیچ Use Caseای نتواند Session را بدون Activity/Round مربوطه به‌صورت ناقص commit کند.
+Transaction boundary همین یک متد در `TrainingSessionDao` است (یک DAO در Room می‌تواند روی چند Entity کار کند). `WorkoutActivityDao` و `RoundDao` فقط برای عملیات تکی روی Activity/Round یک Session **موجود** استفاده می‌شوند و Repository برای ایجاد Session فقط همین یک entry point را صدا می‌زند؛ هدف این است که هیچ Use Caseای نتواند Session را بدون Activity/Round مربوطه به‌صورت ناقص commit کند. این امضا دقیقاً با بخش ۱۵.۲ سند معماری یکسان است.
 
 ---
 
@@ -988,7 +987,9 @@ rounds
 ├── duration
 ├── restDuration
 ├── intensity
-└── notes
+├── notes
+├── createdAt
+└── updatedAt
 ```
 
-**Status: Database Design v3 — Ready for Schema Freeze.**
+**Status: Database Design v4 (Consistency Pass) — Ready for Schema Freeze.**
