@@ -16,7 +16,7 @@
 :core:common | :core:designsystem | :core:security
 ```
 
-### پشتهٔ فنی (version catalogsingle-source در `gradle/libs.versions.toml`)
+### پشتهٔ فنی (single-source در `gradle/libs.versions.toml`)
 AGP 8.7.3 · Kotlin 2.0.21 · KSP 2.0.21-1.0.28 · Compose BOM 2024.12.01 · Hilt 2.53.1 ·
 Navigation Compose 2.8.5 (type-safe routes با `@Serializable`) · Room 2.6.1 · DataStore 1.1.1 ·
 minSdk 24 / target & compile 35 · Java 17
@@ -39,11 +39,11 @@ minSdk 24 / target & compile 35 · Java 17
 ### کیفیت
 - ktlint 12.1.1 روی **هر ۱۴ ماژول** apply و **سبز** (با `.editorconfig` و استثنای نام‌گذاری `@Composable`)
 - `scripts/setup-toolchain.sh`: بوت‌استرپ idempotent ابزارها (JDK/Gradle/SDK)
-- `scripts/build-debug.sh`: بیلد قابل‌تکرار debug ( شامل workaround مستند dex — بخش ۳)
+- `scripts/build-debug.sh`: بیلد قابل‌تکرار debug (شامل workaround مستند dex — بخش ۳)
 
 ---
 
-## ۲. نتیجهٔ معیار پذیرش (DoD)
+## ۲. نتیجه معیار پذیرش (DoD)
 
 | معیار | نتیجه |
 |---|---|
