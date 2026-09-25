@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WARRIOR — Interactive UI Preview</title>
+<style>
+  :root{
+    --bg:#08080b; --panel:#0e0e13; --card:#16161d; --card2:#1e1e27;
+    --line:#2a2a34; --text:#f4f4f6; --muted:#8f8f9c;
+    --accent:#ff4d4d; --accent-soft:rgba(255,77,77,.15);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1100px 600px at 75% -10%, #17171f 0%, var(--bg) 60%);
+    color:var(--text); min-height:100vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:14px; padding:20px;
+  }
+  .caption{font-size:12px;color:var(--muted);text-align:center;max-width:520px;line-height:1.6}
+  .caption b{color:var(--text)}
+  .phone{
+    width:390px;max-width:96vw;height:820px;max-height:88vh;background:var(--panel);
+    border-radius:46px;border:10px solid #23232b;box-shadow:0 30px 90px rgba(0,0,0,.65);
+    overflow:hidden;display:flex;flex-direction:column;position:relative;
+  }
+  .statusbar{height:42px;flex:none;display:flex;align-items:center;justify-content:space-between;
+    padding:0 24px;font-size:13px;font-weight:700;color:var(--text)}
+  .statusbar .icons{display:flex;gap:5px;align-items:center}
+  #viewport{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;position:relative}
+  #viewport::-webkit-scrollbar{display:none}
+  .screen{display:none;padding:8px 18px 26px}
+  .screen.active{display:block;animation:fade .22s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .nav{height:74px;flex:none;display:flex;border-top:1px solid var(--line);background:rgba(10,10,14,.92)}
+  .nav button{flex:1;background:none;border:0;color:var(--muted);display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:5px;font-size:10px;font-weight:600;cursor:pointer}
+  .nav button.active{color:var(--text)}
+  .nav button svg{width:21px;height:21px}
+  /* topbars */
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 2px 14px}
+  .wordmark{font-size:22px;font-weight:900;letter-spacing:2px}
+  .wordmark span{color:var(--accent)}
+  .title{font-size:26px;font-weight:800;letter-spacing:-.4px}
+  .iconbtn{width:38px;height:38px;border-radius:50%;background:var(--card2);border:1px solid var(--line);
+    color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .iconbtn svg{width:17px;height:17px}
+  .avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-soft);border:1px solid var(--accent);
+    color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;cursor:pointer}
+  .tb-actions{display:flex;gap:8px;align-items:center}
+  /* cards & atoms */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px}
+  .muted{color:var(--muted)} .small{font-size:12px} .tiny{font-size:10px}
+  .big{font-size:34px;font-weight:800;letter-spacing:-1px}
+  .sec{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:16px 2px 8px}
+  .row{display:flex;align-items:center;gap:12px;padding:11px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+  .row:last-child{border-bottom:0}
+  .dot-type{width:10px;height:10px;border-radius:3px;flex:none}
+  .grow{flex:1;min-width:0}
+  .badge{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:10px;font-weight:700;color:var(--muted)}
+  .badge.hot{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .btn{width:100%;border:0;border-radius:16px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;
+    background:var(--accent);color:#fff;letter-spacing:.3px}
+  .btn.ghost{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+  .btn.danger{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{padding:7px 11px;border-radius:999px;background:var(--card2);border:1px solid var(--line);
+    font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;user-select:none}
+  .chip.on{background:var(--accent-soft);border-color:var(--accent);color:#fff}
+  .field{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:14px;color:var(--text);
+    padding:13px 14px;font-size:14px;outline:none;font-family:inherit}
+  .field:focus{border-color:var(--accent)}
+  textarea.field{resize:none;height:74px}
+  .lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:12px 0 6px}
+  .stats3{display:flex;gap:10px}
+  .stats3 .card{flex:1;margin-bottom:0;padding:13px;text-align:center}
+  .delta{font-size:10px;font-weight:800}
+  .delta.up{color:#3ddc84}.delta.eq{color:var(--muted)}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .stepper{display:flex;align-items:center;gap:10px}
+  .stepper button{width:30px;height:30px;border-radius:10px;background:var(--card2);border:1px solid var(--line);
+    color:var(--text);font-size:16px;font-weight:800;cursor:pointer}
+  .stepper .val{min-width:64px;text-align:center;font-weight:800;font-size:14px}
+  /* login */
+  .login-wrap{padding:70px 8px 0;text-align:center}
+  .login-wrap .wordmark{font-size:40px}
+  .tag{color:var(--muted);font-size:13px;margin:8px 0 34px;letter-spacing:1px}
+  .login-wrap .field{margin-bottom:10px;text-align:left}
+  /* heatmap */
+  .hm{display:flex;gap:14px;justify-content:space-between}
+  .hm .m{flex:1}
+  .hm .m .mn{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;text-align:center}
+  .hm .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;justify-items:center}
+  .dot{width:7px;height:7px;border-radius:50%;background:#26262e}
+  .dot.on{background:#e9e9ee}
+  .dot.now{background:var(--accent)}
+  /* bars chart */
+  .bars{display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:8px}
+  .bars .b{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+  .bars .bar{width:100%;border-radius:8px 8px 4px 4px;background:var(--card2)}
+  .bars .b.now .bar{background:var(--accent)}
+  .bars .bl{font-size:9px;color:var(--muted);font-weight:700}
+  .hbar{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+  .hbar .track{flex:1;height:8px;border-radius:99px;background:var(--card2);overflow:hidden}
+  .hbar .fill{height:100%;border-radius:99px}
+  .hbar .nm{width:96px;font-size:11px;font-weight:700;color:var(--muted)}
+  .hbar .pc{width:38px;text-align:right;font-size:11px;font-weight:800}
+  /* log flow */
+  .steps{display:flex;gap:6px;margin:2px 2px 14px}
+  .steps .st{flex:1;height:4px;border-radius:99px;background:var(--card2)}
+  .steps .st.on{background:var(--accent)}
+  .act-card{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:10px}
+  .rnd{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:7px}
+  .rnd b{color:var(--text)}
+  .rnd .x{margin-left:auto;color:var(--muted);cursor:pointer;font-size:14px}
+  .backline{display:flex;align-items:center;gap:10px;padding:10px 2px 12px;font-weight:800;font-size:17px;cursor:pointer}
+  .backline svg{width:16px;height:16px}
+  #toast{position:absolute;left:50%;bottom:92px;transform:translateX(-50%) translateY(8px);background:#1d1d25;
+    border:1px solid var(--line);color:var(--text);padding:10px 18px;border-radius:999px;font-size:12px;font-weight:700;
+    opacity:0;pointer-events:none;transition:.25s;z-index:50;white-space:nowrap}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .kv{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .kv:last-child{border-bottom:0}
+  .kv b{font-weight:800}
+</style>
+</head>
+<body>
+  <div class="caption"><b>WARRIOR — Interactive UI Preview</b> · v1 concept · dark theme · English<br>Clickable prototype: log in, log a workout, browse history & progress.</div>
+
+  <div class="phone">
+    <div class="statusbar">
+      <span>4:44</span>
+      <span class="icons">
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4" y="5" width="3" height="7" rx="1"/><rect x="8" y="2" width="3" height="10" rx="1"/><rect x="12" y="0" width="3" height="12" rx="1"/></svg>
+        <svg width="20" height="12" viewBox="0 0 20 12" fill="none" stroke="currentColor"><rect x="0.5" y="0.5" width="16" height="11" rx="3"/><rect x="2" y="2" width="11" height="8" rx="1.5" fill="currentColor" stroke="none"/><rect x="17.5" y="3.5" width="2" height="5" rx="1" fill="currentColor" stroke="none"/></svg>
+      </span>
+    </div>
+
+    <div id="viewport">
+
+      <!-- LOGIN -->
+      <section class="screen active" id="scr-login">
+        <div class="login-wrap">
+          <div class="wordmark">WAR<span>RIOR</span></div>
+          <div class="tag">LOG · TRACK · ANALYZE · IMPROVE</div>
+          <input class="field" id="reg-name" placeholder="Display name" style="display:none">
+          <input class="field" id="li-user" placeholder="Username" value="warrior">
+          <input class="field" id="li-pass" type="password" placeholder="Password" value="••••••••">
+          <div style="height:14px"></div>
+          <button class="btn" data-action="login">Log In</button>
+          <div style="height:10px"></div>
+          <button class="btn ghost" data-action="toggle-reg" id="reg-btn">Create Account</button>
+          <div style="height:26px"></div>
+          <div class="small muted">Local-only account · your data never leaves this device</div>
+        </div>
+      </section>
+
+      <!-- HOME -->
+      <section class="screen" id="scr-home">
+        <div class="topbar">
+          <div class="wordmark">WAR<span>RIOR</span></div>
+          <div class="tb-actions">
+            <div class="iconbtn" data-action="start-log" title="Log workout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+            <div class="avatar" data-action="go-profile">W</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="small muted" style="font-weight:700">THIS WEEK <span id="wk-range"></span></div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin:6px 0 12px">
+            <div class="big" id="wk-time">—</div>
+            <div class="small muted">training time</div>
+            <div style="margin-left:auto" id="wk-time-d"></div>
+          </div>
+          <div class="stats3">
+            <div class="card"><div class="big" style="font-size:24px" id="wk-sess">0</div><div class="tiny muted">SESSIONS</div><div id="wk-sess-d"></div></div>
+            <div class="card"><div class="big" style="font-size:24px" id="wk-rounds">0</div><div class="tiny muted">ROUNDS</div><div id="wk-rounds-d"></div></div>
+            <div class="card"><div class="big" style="font-size:24px" id="wk-int">0</div><div class="tiny muted">AVG INTENSITY</div><div id="wk-int-d"></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="small muted" style="font-weight:700;margin-bottom:10px">TRAINING DAYS · LAST 3 MONTHS</div>
+          <div class="hm" id="hm"></div>
+        </div>
+        <div class="sec">Recent sessions</div>
+        <div class="card" id="recent" style="padding:6px 16px"></div>
+        <div class="sec">Personal records</div>
+        <div class="card">
+          <div class="kv"><span class="muted">Longest session</span><b>1h 45m</b></div>
+          <div class="kv"><span class="muted">Most rounds in one session</span><b>12</b></div>
+          <div class="kv"><span class="muted">Current streak</span><b>3 weeks</b></div>
+        </div>
+        <button class="btn" data-action="start-log">+ Log Workout</button>
+      </section>
+
+      <!-- LOG FLOW -->
+      <section class="screen" id="scr-log">
+        <div class="backline" data-action="log-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          <span id="log-title">New Session</span>
+        </div>
+        <div class="steps"><div class="st on" id="st1"></div><div class="st" id="st2"></div><div class="st" id="st3"></div></div>
+        <div id="log-body"></div>
+      </section>
+
+      <!-- HISTORY -->
+      <section class="screen" id="scr-history">
+        <div class="topbar">
+          <div class="title">History</div>
+          <div class="tb-actions"><div class="iconbtn" data-action="start-log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div></div>
+        </div>
+        <div id="hist"></div>
+      </section>
+
+      <!-- DETAIL -->
+      <section class="screen" id="scr-detail">
+        <div class="backline" data-action="detail-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          <span>Session Detail</span>
+        </div>
+        <div id="detail"></div>
+      </section>
+
+      <!-- PROGRESS -->
+      <section class="screen" id="scr-progress">
+        <div class="topbar"><div class="title">Progress</div></div>
+        <div class="card">
+          <div class="small muted" style="font-weight:700" id="cmp-range"></div>
+          <div style="height:10px"></div>
+          <div class="kv"><span class="muted">Sessions</span><b id="c-sess"></b></div>
+          <div class="kv"><span class="muted">Training time</span><b id="c-time"></b></div>
+          <div class="kv"><span class="muted">Rounds</span><b id="c-rounds"></b></div>
+          <div class="kv"><span class="muted">Avg intensity</span><b id="c-int"></b></div>
+        </div>
+        <div class="sec">Training volume · last 8 weeks</div>
+        <div class="card"><div class="bars" id="bars"></div></div>
+        <div class="sec">Workout distribution</div>
+        <div class="card" id="wdist"></div>
+        <div class="sec">Focus distribution</div>
+        <div class="card" id="fdist"></div>
+      </section>
+
+      <!-- PROFILE -->
+      <section class="screen" id="scr-profile">
+        <div class="topbar"><div class="title">Profile</div></div>
+        <div class="card" style="display:flex;align-items:center;gap:14px">
+          <div class="avatar" style="width:54px;height:54px;font-size:20px">W</div>
+          <div><div style="font-weight:800;font-size:17px">Warrior Demo</div><div class="small muted">@warrior · local account</div></div>
+        </div>
+        <div class="card" style="padding:6px 16px">
+          <div class="row" data-action="soon"><div class="grow">Edit profile</div><span class="badge">Phase 9</span></div>
+          <div class="row" data-action="soon"><div class="grow">Export backup</div><span class="badge">Post-MVP</span></div>
+          <div class="row" data-action="soon"><div class="grow">About · v1.0 MVP</div><span class="badge">offline</span></div>
+        </div>
+        <div class="card">
+          <div class="small muted" style="line-height:1.7">All training data is stored only on this device (Room/SQLite). Password is stored as a PBKDF2 hash with a per-user salt — never in plain text.</div>
+        </div>
+        <button class="btn danger" data-action="logout">Log Out</button>
+      </section>
+
+    </div>
+
+    <nav class="nav" id="nav" style="display:none">
+      <button data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Home</button>
+      <button data-nav="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>History</button>
+      <button data-nav="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 20V12M12 20V4M18 20v-6"/></svg>Progress</button>
+      <button data-nav="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Profile</button>
+    </nav>
+    <div id="toast"></div>
+  </div>
+
+  <div class="caption">Demo data only — the shipped product is a native Android app (Kotlin + Jetpack Compose, fully offline).<br>This prototype validates layout, hierarchy & visual language before Phase 1.</div>
+
+<script>
+const TYPES={
+  HEAVY_BAG:{label:"Heavy Bag",color:"#ff4d4d",rounds:true},
+  MITT_WORK:{label:"Mitt Work",color:"#ffb84d",rounds:true},
+  SPARRING:{label:"Sparring",color:"#c86bfa",rounds:true},
+  CARDIO:{label:"Cardio",color:"#4dc3ff",rounds:false}
+};
+const FOCI=["JAB","FOOTWORK","DEFENSE","HEAD_MOVEMENT","COMBINATIONS","POWER","SPEED","CONDITIONING","TIMING","DISTANCE"];
+const FEELINGS=["EXCELLENT","GOOD","OKAY","TIRED","EXHAUSTED"];
+const fmt=m=>m>=60?Math.floor(m/60)+"h "+(m%60? (m%60)+"m":""):m+"m";
+
+let sessions=[
+ {date:"Thu, Sep 24",week:"this",intensity:8,feeling:"GOOD",acts:[{type:"HEAVY_BAG",dur:55,int:8,focus:"POWER",rounds:6,work:3,rest:1}]},
+ {date:"Tue, Sep 22",week:"this",intensity:7,feeling:"EXCELLENT",acts:[{type:"MITT_WORK",dur:30,int:7,focus:"COMBINATIONS",rounds:5,work:3,rest:1},{type:"CARDIO",dur:20,int:6,focus:"CONDITIONING",rounds:0}]},
+ {date:"Sun, Sep 20",week:"this",intensity:9,feeling:"TIRED",acts:[{type:"SPARRING",dur:60,int:9,focus:"TIMING",rounds:8,work:3,rest:1}]},
+ {date:"Fri, Sep 18",week:"last",intensity:7,feeling:"GOOD",acts:[{type:"HEAVY_BAG",dur:40,int:7,focus:"POWER",rounds:4,work:3,rest:1}]},
+ {date:"Wed, Sep 16",week:"last",intensity:6,feeling:"OKAY",acts:[{type:"CARDIO",dur:35,int:6,focus:"CONDITIONING",rounds:0}]},
+];
+const sDur=s=>s.acts.reduce((a,b)=>a+b.dur,0);
+const sRounds=s=>s.acts.reduce((a,b)=>a+(b.rounds||0),0);
+const sTitle=s=>{const a=s.acts[0];return TYPES[a.type].label+(a.rounds?" · "+a.rounds+" rounds":"")+(s.acts.length>1?" +"+(s.acts.length-1)+" more":"");};
+
+let cur="login",logStep=1,draft=null,regMode=false;
+
+function weekStats(w){const l=sessions.filter(s=>s.week===w);return{
+  n:l.length,min:l.reduce((a,s)=>a+sDur(s),0),rounds:l.reduce((a,s)=>a+sRounds(s),0),
+  int:l.length?Math.round(l.reduce((a,s)=>a+s.intensity,0)/l.length):0};}
+
+function delta(cur,prev,unit){const d=cur-prev;if(!d)return'<span class="delta eq">±0</span>';
+  return '<span class="delta '+(d>0?"up":"eq")+'" style="'+(d<0?"color:#ff8080":"")+'">'+(d>0?"+":"")+d+(unit||"")+"</span>";}
+
+function go(name){cur=name;document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("scr-"+name).classList.add("active");
+  const navOn=["home","history","progress","profile"].includes(name);
+  document.getElementById("nav").style.display=navOn?"flex":"none";
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.nav===name));
+  document.getElementById("viewport").scrollTop=0;
+  if(name==="home")renderHome();if(name==="history")renderHistory();if(name==="progress")renderProgress();}
+
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");
+  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1900);}
+
+/* ---------- HOME ---------- */
+function renderHome(){
+  const t=weekStats("this"),l=weekStats("last");
+  document.getElementById("wk-range").textContent="· Sep 19 – Sep 25";
+  document.getElementById("wk-time").textContent=fmt(t.min);
+  document.getElementById("wk-time-d").innerHTML=delta(t.min,l.min,"m");
+  document.getElementById("wk-sess").textContent=t.n;
+  document.getElementById("wk-sess-d").innerHTML=delta(t.n,l.n);
+  document.getElementById("wk-rounds").textContent=t.rounds;
+  document.getElementById("wk-rounds-d").innerHTML=delta(t.rounds,l.rounds);
+  document.getElementById("wk-int").textContent=t.int;
+  document.getElementById("wk-int-d").innerHTML=delta(t.int,l.int);
+  document.getElementById("recent").innerHTML=sessions.slice(0,3).map((s,i)=>rowHTML(s,i)).join("");
+  renderHeatmap();
+}
+function rowHTML(s,i){return '<div class="row" data-action="detail" data-i="'+i+'">'+
+  '<div class="dot-type" style="background:'+TYPES[s.acts[0].type].color+'"></div>'+
+  '<div class="grow"><div style="font-weight:700;font-size:14px">'+sTitle(s)+'</div>'+
+  '<div class="tiny muted">'+s.date+" · "+fmt(sDur(s))+" · felt "+s.feeling.toLowerCase()+"</div></div>"+
+  '<span class="badge hot">INT '+s.intensity+"</span></div>";}
+function renderHeatmap(){
+  const pat={Jul:[2,5,9,12,16,19,23,26,30],Aug:[1,4,8,11,15,18,22,25,29],Sep:[1,3,7,10,14,17,20,22,24,25]};
+  document.getElementById("hm").innerHTML=Object.keys(pat).map(m=>{
+    let dots="";for(let d=1;d<=31;d++){const on=pat[m].includes(d);const now=m==="Sep"&&d===25;
+      dots+='<div class="dot'+(on?" on":"")+(now?" now":"")+'"></div>';}
+    return '<div class="m"><div class="mn">'+m+'</div><div class="grid">'+dots+"</div></div>";}).join("");}
+
+/* ---------- HISTORY / DETAIL ---------- */
+function renderHistory(){
+  const groups=[["This week","this"],["Last week","last"]];
+  document.getElementById("hist").innerHTML=groups.map(([label,w])=>{
+    const list=sessions.map((s,i)=>[s,i]).filter(([s])=>s.week===w);
+    if(!list.length)return"";
+    return '<div class="sec">'+label+'</div><div class="card" style="padding:6px 16px">'+
+      list.map(([s,i])=>rowHTML(s,i)).join("")+"</div>";}).join("");}
+function renderDetail(i){const s=sessions[i];
+  document.getElementById("detail").innerHTML=
+   '<div class="card"><div style="font-weight:800;font-size:18px">'+sTitle(s)+'</div>'+
+   '<div class="small muted" style="margin:4px 0 10px">'+s.date+" · "+fmt(sDur(s))+" · "+sRounds(s)+" rounds</div>"+
+   '<div class="kv"><span class="muted">Overall intensity</span><b>'+s.intensity+" / 10</b></div>"+
+   '<div class="kv"><span class="muted">Feeling</span><b>'+s.feeling+"</b></div></div>"+
+   s.acts.map(a=>'<div class="card"><div style="display:flex;align-items:center;gap:9px">'+
+     '<div class="dot-type" style="background:'+TYPES[a.type].color+'"></div>'+
+     '<div style="font-weight:800">'+TYPES[a.type].label+'</div>'+
+     '<span class="badge" style="margin-left:auto">'+fmt(a.dur)+"</span></div>"+
+     '<div class="small muted" style="margin:7px 0">'+(a.rounds?a.rounds+" rounds · "+a.work+"min work / "+a.rest+"min rest":"steady state")+" · intensity "+a.int+"/10</div>"+
+     '<div class="chips"><span class="chip on">'+a.focus+"</span></div>"+
+     (a.rounds?Array.from({length:a.rounds},(_,r)=>'<div class="rnd"><b>R'+(r+1)+"</b> "+a.work+":00 work · "+a.rest+":00 rest</div>").join(""):"")+
+     "</div>").join("")+
+   '<button class="btn danger" data-action="del" data-i="'+i+'">Delete Session</button>';}
+
+/* ---------- PROGRESS ---------- */
+function renderProgress(){
+  const t=weekStats("this"),l=weekStats("last");
+  document.getElementById("cmp-range").textContent="SEP 19 – SEP 25  vs  PREVIOUS WEEK";
+  document.getElementById("c-sess").innerHTML=t.n+"  "+delta(t.n,l.n);
+  document.getElementById("c-time").innerHTML=fmt(t.min)+"  "+delta(t.min,l.min,"m");
+  document.getElementById("c-rounds").innerHTML=t.rounds+"  "+delta(t.rounds,l.rounds);
+  document.getElementById("c-int").innerHTML=t.int+"  "+delta(t.int,l.int);
+  const weeks=[95,120,80,140,110,160,75,t.min||165];
+  const max=Math.max(...weeks);
+  document.getElementById("bars").innerHTML=weeks.map((w,i)=>{
+    const now=i===weeks.length-1;
+    return '<div class="b'+(now?" now":"")+'"><div class="bar" style="height:'+Math.round(w/max*100)+'%"></div><div class="bl">'+(now?"NOW":"W-"+(weeks.length-1-i))+"</div></div>";}).join("");
+  const per={};sessions.forEach(s=>s.acts.forEach(a=>per[a.type]=(per[a.type]||0)+a.dur));
+  const tot=Object.values(per).reduce((a,b)=>a+b,0);
+  document.getElementById("wdist").innerHTML=Object.keys(TYPES).map(k=>{
+    const v=per[k]||0,p=Math.round(v/tot*100);
+    return '<div class="hbar"><div class="nm">'+TYPES[k].label+'</div><div class="track"><div class="fill" style="width:'+p+"%;background:"+TYPES[k].color+'"></div></div><div class="pc">'+p+"%</div></div>";}).join("");
+  const pf={};sessions.forEach(s=>s.acts.forEach(a=>pf[a.focus]=(pf[a.focus]||0)+a.dur));
+  const top=Object.entries(pf).sort((a,b)=>b[1]-a[1]).slice(0,4);const fm=top[0][1];
+  document.getElementById("fdist").innerHTML=top.map(([k,v])=>
+    '<div class="hbar"><div class="nm">'+k.replace("_"," ")+'</div><div class="track"><div class="fill" style="width:'+Math.round(v/fm*100)+'%;background:#8f8f9c"></div></div><div class="pc">'+fmt(v)+"</div></div>").join("");}
+
+/* ---------- LOG FLOW ---------- */
+function startLog(){draft={intensity:7,feeling:"GOOD",notes:"",acts:[]};logStep=1;go("log");renderLog();}
+function renderLog(){
+  document.getElementById("st1").className="st"+(logStep>=1?" on":"");
+  document.getElementById("st2").className="st"+(logStep>=2?" on":"");
+  document.getElementById("st3").className="st"+(logStep>=3?" on":"");
+  document.getElementById("log-title").textContent=["Session Info","Activities","Review & Save"][logStep-1];
+  const b=document.getElementById("log-body");
+  if(logStep===1){b.innerHTML=
+    '<div class="card"><div class="lbl">Date</div><div style="font-weight:800">Fri, Sep 25, 2026</div>'+
+    '<div class="lbl">Overall intensity — <span id="iv">'+draft.intensity+"</span>/10</div>"+
+    '<input type="range" min="1" max="10" value="'+draft.intensity+'" data-role="int">'+
+    '<div class="lbl">Feeling</div><div class="chips" data-role="feel">'+
+    FEELINGS.map(f=>'<span class="chip'+(f===draft.feeling?" on":"")+'" data-f="'+f+'">'+f+"</span>").join("")+"</div>"+
+    '<div class="lbl">Notes</div><textarea class="field" placeholder="How did it go?" data-role="notes">'+draft.notes+"</textarea></div>"+
+    '<button class="btn" data-action="log-next">Continue →</button>';}
+  if(logStep===2){b.innerHTML=
+    draft.acts.map((a,i)=>'<div class="act-card">'+
+      '<div class="chips" data-role="type" data-i="'+i+'">'+Object.keys(TYPES).map(k=>
+        '<span class="chip'+(k===a.type?" on":"")+'" data-k="'+k+'">'+TYPES[k].label+"</span>").join("")+"</div>"+
+      '<div class="lbl">Duration</div><div class="stepper"><button data-action="dur" data-i="'+i+'" data-d="-5">−</button><div class="val">'+fmt(a.dur)+'</div><button data-action="dur" data-i="'+i+'" data-d="5">+</button></div>'+
+      '<div class="lbl">Intensity — '+a.int+'/10</div><input type="range" min="1" max="10" value="'+a.int+'" data-role="aint" data-i="'+i+'">'+
+      '<div class="lbl">Focus</div><div class="chips" data-role="focus" data-i="'+i+'">'+
+      FOCI.map(f=>'<span class="chip'+(f===a.focus?" on":"")+'" data-f="'+f+'">'+f.replace("_"," ")+"</span>").join("")+"</div>"+
+      (TYPES[a.type].rounds?'<div class="lbl">Rounds — '+a.rounds+'</div><div class="stepper"><button data-action="rnd" data-i="'+i+'" data-d="-1">−</button><div class="val">'+a.rounds+' rounds</div><button data-action="rnd" data-i="'+i+'" data-d="1">+</button></div>'+
+        '<div class="rnd">'+a.work+"min work / "+a.rest+'min rest each</div>':"")+
+      '<div class="rnd" style="margin-top:10px"><span class="x" data-action="rmact" data-i="'+i+'">✕ remove</span></div>'+
+    "</div>").join("")+
+    '<button class="btn ghost" data-action="addact">+ Add Activity</button><div style="height:10px"></div>'+
+    '<button class="btn'+(draft.acts.length?"":" ghost")+'" data-action="log-next"'+(draft.acts.length?"":" disabled")+">Continue →</button>";}
+  if(logStep===3){const min=draft.acts.reduce((a,x)=>a+x.dur,0),rn=draft.acts.reduce((a,x)=>a+(x.rounds||0),0);
+    b.innerHTML='<div class="card"><div class="kv"><span class="muted">Date</span><b>Fri, Sep 25, 2026</b></div>'+
+    '<div class="kv"><span class="muted">Activities</span><b>'+draft.acts.length+"</b></div>"+
+    '<div class="kv"><span class="muted">Total duration</span><b>'+fmt(min)+"</b></div>"+
+    '<div class="kv"><span class="muted">Rounds</span><b>'+rn+"</b></div>"+
+    '<div class="kv"><span class="muted">Overall intensity</span><b>'+draft.intensity+"/10</b></div>"+
+    '<div class="kv"><span class="muted">Feeling</span><b>'+draft.feeling+"</b></div></div>"+
+    '<div class="card" style="padding:6px 16px">'+draft.acts.map(a=>'<div class="row" style="cursor:default"><div class="dot-type" style="background:'+TYPES[a.type].color+'"></div><div class="grow"><div style="font-weight:700;font-size:13px">'+TYPES[a.type].label+(a.rounds?" · "+a.rounds+" rounds":"")+'</div><div class="tiny muted">'+a.focus.replace("_"," ")+" · "+fmt(a.dur)+"</div></div></div>").join("")+"</div>"+
+    '<button class="btn" data-action="save">Save Session</button>';}
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",e=>{
+  const nav=e.target.closest("[data-nav]");if(nav){go(nav.dataset.nav);return;}
+  const chip=e.target.closest(".chip");
+  if(chip){const wrap=chip.parentElement,role=wrap.dataset.role;
+    if(role==="feel"){draft.feeling=chip.dataset.f;renderLog();return;}
+    if(role==="type"){const x=draft.acts[+wrap.dataset.i];x.type=chip.dataset.k;
+      if(TYPES[x.type].rounds&&!x.rounds)x.rounds=4;if(!TYPES[x.type].rounds)x.rounds=0;renderLog();return;}
+    if(role==="focus"){draft.acts[+wrap.dataset.i].focus=chip.dataset.f;renderLog();return;}}
+  const el=e.target.closest("[data-action]");if(!el)return;
+  const a=el.dataset.action;
+  if(a==="login")go("home");
+  if(a==="toggle-reg"){regMode=!regMode;document.getElementById("reg-name").style.display=regMode?"block":"none";
+    document.getElementById("reg-btn").textContent=regMode?"Back to Login":"Create Account";
+    document.querySelector('[data-action="login"]').textContent=regMode?"Create Account":"Log In";}
+  if(a==="logout"){toast("Logged out — session cleared");go("login");}
+  if(a==="go-profile")go("profile");
+  if(a==="soon")toast("Available in a later phase");
+  if(a==="start-log")startLog();
+  if(a==="detail"){renderDetail(+el.dataset.i);go("detail");}
+  if(a==="detail-back")go("history");
+  if(a==="del"){sessions.splice(+el.dataset.i,1);toast("Session deleted (cascade)");go("history");}
+  if(a==="log-back"){if(logStep>1){logStep--;renderLog();}else go("home");}
+  if(a==="log-next"){logStep++;renderLog();}
+  if(a==="addact"){draft.acts.push({type:"HEAVY_BAG",dur:15,int:7,focus:"POWER",rounds:4,work:3,rest:1});renderLog();}
+  if(a==="rmact"){draft.acts.splice(+el.dataset.i,1);renderLog();}
+  if(a==="dur"){const x=draft.acts[+el.dataset.i];x.dur=Math.max(5,x.dur+ +el.dataset.d);renderLog();}
+  if(a==="rnd"){const x=draft.acts[+el.dataset.i];x.rounds=Math.max(0,x.rounds+ +el.dataset.d);renderLog();}
+  if(a==="save"){
+    sessions.unshift({date:"Fri, Sep 25",week:"this",intensity:draft.intensity,feeling:draft.feeling,acts:draft.acts});
+    toast("Session saved — transaction committed ✓");go("history");}
+});
+document.addEventListener("input",e=>{
+  const r=e.target;
+  if(r.dataset.role==="int"){draft.intensity=+r.value;document.getElementById("iv").textContent=r.value;}
+  if(r.dataset.role==="aint"){const v=+r.value;draft.acts[+r.dataset.i].int=v;
+    const lbl=r.previousElementSibling;if(lbl&&lbl.classList.contains("lbl"))lbl.textContent="Intensity — "+v+"/10";}
+  if(r.dataset.role==="notes")draft.notes=r.value;
+});
+renderHome();
+</script>
+</body>
+</html>
