@@ -1,0 +1,24 @@
+package com.warrior.data.local.di
+
+import com.warrior.data.local.repository.RoomAuthRepository
+import com.warrior.data.local.session.LocalSessionManager
+import com.warrior.domain.auth.AuthRepository
+import com.warrior.domain.auth.LocalSession
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class AuthModule {
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepository(impl: RoomAuthRepository): AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindLocalSession(impl: LocalSessionManager): LocalSession
+}

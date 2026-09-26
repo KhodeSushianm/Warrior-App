@@ -34,4 +34,5 @@ java -Xmx850m -XX:MaxMetaspaceSize=256m -Dfile.encoding=UTF-8 \
     org.junit.runner.JUnitCore \
     com.warrior.data.local.WarriorDatabaseTest \
     com.warrior.data.local.SessionMapperTest \
+    com.warrior.data.local.AuthRepositoryTest \
     "$@"

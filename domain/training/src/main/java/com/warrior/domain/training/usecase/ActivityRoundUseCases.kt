@@ -4,12 +4,13 @@ import com.warrior.domain.training.TrainingRepository
 import com.warrior.domain.training.model.Round
 import com.warrior.domain.training.model.WorkoutActivity
 import com.warrior.domain.training.validation.TrainingValidation
+import javax.inject.Inject
 
 /**
  * Activity/Round edits operate on the session aggregate and are persisted
  * atomically through [TrainingRepository.updateSession] (Architecture Rule 7).
  */
-class AddWorkoutActivity(private val repository: TrainingRepository) {
+class AddWorkoutActivity @Inject constructor(private val repository: TrainingRepository) {
     suspend operator fun invoke(userId: Long, sessionId: Long, activity: WorkoutActivity): Result<Unit> =
         runCatching {
             val session = requireSession(repository, userId, sessionId)
@@ -21,7 +22,7 @@ class AddWorkoutActivity(private val repository: TrainingRepository) {
         }
 }
 
-class UpdateWorkoutActivity(private val repository: TrainingRepository) {
+class UpdateWorkoutActivity @Inject constructor(private val repository: TrainingRepository) {
     suspend operator fun invoke(userId: Long, sessionId: Long, activity: WorkoutActivity): Result<Unit> =
         runCatching {
             val session = requireSession(repository, userId, sessionId)
@@ -38,7 +39,7 @@ class UpdateWorkoutActivity(private val repository: TrainingRepository) {
         }
 }
 
-class DeleteWorkoutActivity(private val repository: TrainingRepository) {
+class DeleteWorkoutActivity @Inject constructor(private val repository: TrainingRepository) {
     suspend operator fun invoke(userId: Long, sessionId: Long, activityId: Long): Result<Unit> =
         runCatching {
             val session = requireSession(repository, userId, sessionId)
@@ -48,7 +49,7 @@ class DeleteWorkoutActivity(private val repository: TrainingRepository) {
         }
 }
 
-class AddRound(private val repository: TrainingRepository) {
+class AddRound @Inject constructor(private val repository: TrainingRepository) {
     suspend operator fun invoke(userId: Long, sessionId: Long, activityId: Long, round: Round): Result<Unit> =
         runCatching {
             val session = requireSession(repository, userId, sessionId)
@@ -72,7 +73,7 @@ class AddRound(private val repository: TrainingRepository) {
         }
 }
 
-class UpdateRound(private val repository: TrainingRepository) {
+class UpdateRound @Inject constructor(private val repository: TrainingRepository) {
     suspend operator fun invoke(userId: Long, sessionId: Long, activityId: Long, round: Round): Result<Unit> =
         runCatching {
             val session = requireSession(repository, userId, sessionId)
@@ -94,7 +95,7 @@ class UpdateRound(private val repository: TrainingRepository) {
         }
 }
 
-class DeleteRound(private val repository: TrainingRepository) {
+class DeleteRound @Inject constructor(private val repository: TrainingRepository) {
     suspend operator fun invoke(userId: Long, sessionId: Long, activityId: Long, roundId: Long): Result<Unit> =
         runCatching {
             val session = requireSession(repository, userId, sessionId)

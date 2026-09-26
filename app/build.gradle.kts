@@ -47,6 +47,8 @@ android {
 dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:designsystem"))
+    implementation(project(":data:local"))
+    implementation(project(":domain:auth"))
     implementation(project(":feature:auth"))
     implementation(project(":feature:home"))
     implementation(project(":feature:workout"))

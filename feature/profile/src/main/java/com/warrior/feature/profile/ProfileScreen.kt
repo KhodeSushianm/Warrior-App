@@ -16,9 +16,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.warrior.core.designsystem.components.WarriorBadge
 import com.warrior.core.designsystem.components.WarriorButton
 import com.warrior.core.designsystem.components.WarriorButtonVariant
@@ -30,9 +33,12 @@ import com.warrior.core.designsystem.theme.TextMuted
 
 @Composable
 fun ProfileScreen(
-    onLogout: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: ProfileViewModel = hiltViewModel(),
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val account = state.account
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -48,13 +54,17 @@ fun ProfileScreen(
                         .background(AccentSoft, CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text("W", color = Accent, style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        (account?.displayName ?: "?").take(1).uppercase(),
+                        color = Accent,
+                        style = MaterialTheme.typography.titleLarge,
+                    )
                 }
                 Spacer(Modifier.width(14.dp))
                 Column {
-                    Text("Warrior Demo", style = MaterialTheme.typography.titleLarge)
+                    Text(account?.displayName ?: "—", style = MaterialTheme.typography.titleLarge)
                     Text(
-                        "@warrior · local account",
+                        "@${account?.username ?: "—"} · local account",
                         style = MaterialTheme.typography.bodyMedium,
                         color = TextMuted,
                     )
@@ -62,7 +72,11 @@ fun ProfileScreen(
             }
         }
         Spacer(Modifier.height(12.dp))
-        WarriorButton(text = "Log Out", onClick = onLogout, variant = WarriorButtonVariant.DANGER)
+        WarriorButton(
+            text = "Log Out",
+            onClick = viewModel::onLogout,
+            variant = WarriorButtonVariant.DANGER,
+        )
         Spacer(Modifier.height(12.dp))
         WarriorBadge(text = "PHASE 9 · EDIT PROFILE")
     }

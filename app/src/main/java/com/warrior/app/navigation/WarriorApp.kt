@@ -11,12 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.warrior.app.AppViewModel
 import com.warrior.core.designsystem.icons.WarriorIconHistory
 import com.warrior.core.designsystem.icons.WarriorIconHome
 import com.warrior.core.designsystem.icons.WarriorIconProfile
@@ -35,8 +37,25 @@ import com.warrior.feature.workout.WorkoutScreen
 
 private val MAIN_ROUTES = setOf("HomeRoute", "HistoryRoute", "ProgressRoute", "ProfileRoute")
 
+/**
+ * Root of the app: the device session (DataStore) decides the entry point
+ * (Architecture v2.1 §14.2). Login/register start the session, logout clears
+ * it — both swap the tree automatically, no manual navigation needed.
+ */
 @Composable
 fun WarriorApp() {
+    val appViewModel: AppViewModel = hiltViewModel()
+    val currentUserId by appViewModel.currentUserId.collectAsStateWithLifecycle(initialValue = null)
+
+    if (currentUserId == null) {
+        AuthScreen()
+    } else {
+        MainScreen()
+    }
+}
+
+@Composable
+private fun MainScreen() {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route?.substringAfterLast('.')
@@ -81,30 +100,15 @@ fun WarriorApp() {
     ) { padding ->
         NavHost(
             navController = navController,
-            startDestination = AuthRoute,
+            startDestination = HomeRoute,
             modifier = Modifier.padding(padding),
         ) {
-            composable<AuthRoute> {
-                AuthScreen(
-                    onAuthenticated = {
-                        navController.navigate(HomeRoute) {
-                            popUpTo<AuthRoute> { inclusive = true }
-                        }
-                    },
-                )
-            }
             composable<HomeRoute> {
                 HomeScreen(onStartWorkout = { navController.navigate(WorkoutRoute) })
             }
             composable<HistoryRoute> { HistoryScreen() }
             composable<ProgressRoute> { ProgressScreen() }
-            composable<ProfileRoute> {
-                ProfileScreen(
-                    onLogout = {
-                        navController.navigate(AuthRoute) { popUpTo(0) }
-                    },
-                )
-            }
+            composable<ProfileRoute> { ProfileScreen() }
             composable<WorkoutRoute> {
                 WorkoutScreen(onBack = { navController.popBackStack() })
             }
@@ -123,7 +127,7 @@ private fun warriorNavItemColors() = NavigationBarItemDefaults.colors(
 
 private fun NavHostController.navigateTab(route: Any) {
     navigate(route) {
-        popUpTo(graph.findStartDestination().id) { saveState = true }
+        popUpTo<HomeRoute> { saveState = true }
         launchSingleTop = true
         restoreState = true
     }

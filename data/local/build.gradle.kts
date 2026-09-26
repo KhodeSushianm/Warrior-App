@@ -30,6 +30,7 @@ ksp {
 
 dependencies {
     implementation(project(":core:common"))
+    implementation(project(":core:security"))
     implementation(project(":domain:auth"))
     implementation(project(":domain:training"))
     implementation(project(":domain:progress"))
