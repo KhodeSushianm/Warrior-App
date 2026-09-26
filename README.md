@@ -14,7 +14,8 @@
 | فاز ۱ — Foundation (پروژهٔ ماژولار + دیزاین‌سیستم) | ✅ کامل — [گزارش فاز](docs/phase-reports/01-foundation.md) |
 | فاز ۲ — Database (اسکیما + DAOها + تست‌ها) | ✅ کامل + **Schema Freeze** — [گزارش فاز](docs/phase-reports/02-database.md) |
 | فاز ۳ — Domain & Repository (مدل‌ها، Use Caseها، Validation) | ✅ کامل — [گزارش فاز](docs/phase-reports/03-domain-repository.md) |
-| فاز ۴ تا ۱۰ |  منتظر تایید مالک برای شروع فاز ۴ |
+| فاز ۴ — Authentication (PBKDF2 + DataStore session) | ✅ کامل — [گزارش فاز](docs/phase-reports/04-authentication.md) |
+| فاز ۵ تا ۱۰ | ⏸ منتظر تایید مالک برای شروع فاز ۵ |
 
 ## بیلد
 
