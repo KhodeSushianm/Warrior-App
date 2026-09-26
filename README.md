@@ -15,7 +15,8 @@
 | فاز ۲ — Database (اسکیما + DAOها + تست‌ها) | ✅ کامل + **Schema Freeze** — [گزارش فاز](docs/phase-reports/02-database.md) |
 | فاز ۳ — Domain & Repository (مدل‌ها، Use Caseها، Validation) | ✅ کامل — [گزارش فاز](docs/phase-reports/03-domain-repository.md) |
 | فاز ۴ — Authentication (PBKDF2 + DataStore session) | ✅ کامل — [گزارش فاز](docs/phase-reports/04-authentication.md) |
-| فاز ۵ تا ۱۰ | ⏸ منتظر تایید مالک برای شروع فاز ۵ |
+| فاز ۵ — Workout Logging (جریان ساخت/ویرایش/حذف Session) | ✅ کامل — [گزارش فاز](docs/phase-reports/05-workout-logging.md) |
+| فاز ۶ تا ۱۰ | ⏸ منتظر تایید مالک برای شروع فاز ۶ |
 
 ## بیلد
 
