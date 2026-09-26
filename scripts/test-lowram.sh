@@ -31,4 +31,7 @@ echo ">> running WarriorDatabaseTest in standalone JVM (850m heap)..."
 cd data/local
 java -Xmx850m -XX:MaxMetaspaceSize=256m -Dfile.encoding=UTF-8 \
     -cp "$(cat /tmp/warrior_test_cp.txt)" \
-    org.junit.runner.JUnitCore com.warrior.data.local.WarriorDatabaseTest
+    org.junit.runner.JUnitCore \
+    com.warrior.data.local.WarriorDatabaseTest \
+    com.warrior.data.local.SessionMapperTest \
+    "$@"

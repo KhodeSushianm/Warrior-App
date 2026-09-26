@@ -87,7 +87,36 @@ abstract class TrainingSessionDao {
         activitiesWithRounds: List<ActivityWithRounds>,
     ): Long {
         val sessionId = insertSession(session)
+        insertActivitiesAndRounds(sessionId, activitiesWithRounds)
+        return sessionId
+    }
 
+    /**
+     * Atomic replace of an existing aggregate (Phase 3 edit flow):
+     * update header, drop old activities (rounds cascade), insert the new tree.
+     */
+    @Transaction
+    open suspend fun updateFullSession(
+        session: TrainingSessionEntity,
+        activitiesWithRounds: List<ActivityWithRounds>,
+    ) {
+        updateSession(session)
+        deleteActivitiesOfSession(session.id)
+        insertActivitiesAndRounds(session.id, activitiesWithRounds)
+    }
+
+    @Query(
+        """
+        DELETE FROM workout_activities
+        WHERE sessionId = :sessionId
+        """,
+    )
+    protected abstract suspend fun deleteActivitiesOfSession(sessionId: Long)
+
+    private suspend fun insertActivitiesAndRounds(
+        sessionId: Long,
+        activitiesWithRounds: List<ActivityWithRounds>,
+    ) {
         val activityIds = insertActivities(
             activitiesWithRounds.map {
                 it.activity.copy(sessionId = sessionId)
@@ -102,7 +131,5 @@ abstract class TrainingSessionDao {
         if (allRounds.isNotEmpty()) {
             insertRounds(allRounds)
         }
-
-        return sessionId
     }
 }

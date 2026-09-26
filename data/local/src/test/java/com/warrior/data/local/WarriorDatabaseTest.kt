@@ -19,8 +19,8 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -136,7 +136,8 @@ class WarriorDatabaseTest {
         val userId = newUser("warrior")
         val broken = ActivityWithRounds(
             activity(),
-            listOf(round(1), round(1)), // duplicate roundNumber -> unique index violation
+            // duplicate roundNumber -> unique index violation
+            listOf(round(1), round(1)),
         )
 
         val error = runCatching {
