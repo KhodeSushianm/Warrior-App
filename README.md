@@ -16,7 +16,8 @@
 | فاز ۳ — Domain & Repository (مدل‌ها، Use Caseها، Validation) | ✅ کامل — [گزارش فاز](docs/phase-reports/03-domain-repository.md) |
 | فاز ۴ — Authentication (PBKDF2 + DataStore session) | ✅ کامل — [گزارش فاز](docs/phase-reports/04-authentication.md) |
 | فاز ۵ — Workout Logging (جریان ساخت/ویرایش/حذف Session) | ✅ کامل — [گزارش فاز](docs/phase-reports/05-workout-logging.md) |
-| فاز ۶ تا ۱۰ | ⏸ منتظر تایید مالک برای شروع فاز ۶ |
+| فاز ۶ — History (لیست روزانه + جزئیات زنده) | ✅ کامل — [گزارش فاز](docs/phase-reports/06-history.md) |
+| فاز ۷ تا ۱۰ | ⏸ منتظر تایید مالک برای شروع فاز ۷ |
 
 ## بیلد
 
