@@ -13,7 +13,8 @@
 | مرجع بصری UI/UX + پروتوتایپ تعاملی | ✅ تاییدشده |
 | فاز ۱ — Foundation (پروژهٔ ماژولار + دیزاین‌سیستم) | ✅ کامل — [گزارش فاز](docs/phase-reports/01-foundation.md) |
 | فاز ۲ — Database (اسکیما + DAOها + تست‌ها) | ✅ کامل + **Schema Freeze** — [گزارش فاز](docs/phase-reports/02-database.md) |
-| فاز ۳ تا ۱۰ |  منتظر تایید مالک برای شروع فاز ۳ |
+| فاز ۳ — Domain & Repository (مدل‌ها، Use Caseها، Validation) | ✅ کامل — [گزارش فاز](docs/phase-reports/03-domain-repository.md) |
+| فاز ۴ تا ۰ |  منتظر تایید مالک برای شروع فاز ۴ |
 
 ## بیلد
 
