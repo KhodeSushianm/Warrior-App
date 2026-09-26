@@ -18,6 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.warrior.app.AppViewModel
 import com.warrior.core.designsystem.icons.WarriorIconHistory
 import com.warrior.core.designsystem.icons.WarriorIconHome
@@ -33,7 +34,7 @@ import com.warrior.feature.history.HistoryScreen
 import com.warrior.feature.home.HomeScreen
 import com.warrior.feature.profile.ProfileScreen
 import com.warrior.feature.progress.ProgressScreen
-import com.warrior.feature.workout.WorkoutScreen
+import com.warrior.feature.workout.WorkoutLoggingScreen
 
 private val MAIN_ROUTES = setOf("HomeRoute", "HistoryRoute", "ProgressRoute", "ProfileRoute")
 
@@ -109,8 +110,13 @@ private fun MainScreen() {
             composable<HistoryRoute> { HistoryScreen() }
             composable<ProgressRoute> { ProgressScreen() }
             composable<ProfileRoute> { ProfileScreen() }
-            composable<WorkoutRoute> {
-                WorkoutScreen(onBack = { navController.popBackStack() })
+            composable<WorkoutRoute> { entry ->
+                val route = entry.toRoute<WorkoutRoute>()
+                WorkoutLoggingScreen(
+                    sessionId = route.sessionId,
+                    onBack = { navController.popBackStack() },
+                    onSaved = { navController.popBackStack() },
+                )
             }
         }
     }

@@ -3,8 +3,8 @@ package com.warrior.domain.training.usecase
 import com.warrior.domain.training.TrainingRepository
 import com.warrior.domain.training.model.TrainingSession
 import com.warrior.domain.training.validation.TrainingValidation
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
 /** Creates a full session aggregate atomically. Fails with [com.warrior.domain.training.validation.ValidationException] on invalid input. */
 class CreateTrainingSession @Inject constructor(private val repository: TrainingRepository) {

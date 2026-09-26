@@ -18,4 +18,4 @@ data object ProgressRoute
 data object ProfileRoute
 
 @Serializable
-data object WorkoutRoute
+data class WorkoutRoute(val sessionId: Long? = null)
