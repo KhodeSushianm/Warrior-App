@@ -1,0 +1,46 @@
+package com.warrior.core.common.time
+
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
+
+/**
+ * Display formatting for v1 (English, Gregorian — owner decision at Phase 6).
+ * Storage stays UTC epoch millis of local-day midnight (DB v4 §9); only
+ * presentation uses the device timezone.
+ */
+object DateFormats {
+
+    private const val DAY_MS = 86_400_000L
+
+    private fun fullFormatter() = SimpleDateFormat("EEE, MMM d, yyyy", Locale.ENGLISH)
+
+    private fun shortFormatter() = SimpleDateFormat("EEE, MMM d", Locale.ENGLISH)
+
+    /** "Today" / "Yesterday" / "Fri, Sep 25, 2026" — used for history day headers. */
+    fun dayHeader(
+        dateUtcMillis: Long,
+        now: Long = System.currentTimeMillis(),
+        zone: TimeZone = TimeZone.getDefault(),
+    ): String {
+        val today = TimeUtils.localDayMidnightUtcMillis(now, zone)
+        val day = TimeUtils.localDayMidnightUtcMillis(dateUtcMillis, zone)
+        return when (day) {
+            today -> "Today"
+            today - DAY_MS -> "Yesterday"
+            else -> fullFormatter().format(Date(day))
+        }
+    }
+
+    /** "Fri, Sep 25" — compact row labels. */
+    fun short(dateUtcMillis: Long, zone: TimeZone = TimeZone.getDefault()): String {
+        val formatter = shortFormatter()
+        formatter.timeZone = zone
+        return formatter.format(Date(dateUtcMillis))
+    }
+
+    /** 165 -> "2h 45m"; 45 -> "45m". */
+    fun durationLabel(totalMinutes: Long): String =
+        if (totalMinutes >= 60) "${totalMinutes / 60}h ${totalMinutes % 60}m" else "${totalMinutes}m"
+}

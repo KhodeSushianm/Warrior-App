@@ -30,6 +30,7 @@ import com.warrior.core.designsystem.theme.SurfaceVariant
 import com.warrior.core.designsystem.theme.TextMuted
 import com.warrior.core.designsystem.theme.TextPrimary
 import com.warrior.feature.auth.AuthScreen
+import com.warrior.feature.history.HistoryDetailScreen
 import com.warrior.feature.history.HistoryScreen
 import com.warrior.feature.home.HomeScreen
 import com.warrior.feature.profile.ProfileScreen
@@ -107,7 +108,19 @@ private fun MainScreen() {
             composable<HomeRoute> {
                 HomeScreen(onStartWorkout = { navController.navigate(WorkoutRoute) })
             }
-            composable<HistoryRoute> { HistoryScreen() }
+            composable<HistoryRoute> {
+                HistoryScreen(
+                    onOpenSession = { id -> navController.navigate(HistoryDetailRoute(id)) },
+                    onStartWorkout = { navController.navigate(WorkoutRoute()) },
+                )
+            }
+            composable<HistoryDetailRoute> { entry ->
+                val route = entry.toRoute<HistoryDetailRoute>()
+                HistoryDetailScreen(
+                    onBack = { navController.popBackStack() },
+                    onEdit = { id -> navController.navigate(WorkoutRoute(id)) },
+                )
+            }
             composable<ProgressRoute> { ProgressScreen() }
             composable<ProfileRoute> { ProfileScreen() }
             composable<WorkoutRoute> { entry ->

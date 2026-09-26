@@ -12,6 +12,9 @@ data object HomeRoute
 data object HistoryRoute
 
 @Serializable
+data class HistoryDetailRoute(val sessionId: Long)
+
+@Serializable
 data object ProgressRoute
 
 @Serializable
