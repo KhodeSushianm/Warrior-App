@@ -106,7 +106,10 @@ private fun MainScreen() {
             modifier = Modifier.padding(padding),
         ) {
             composable<HomeRoute> {
-                HomeScreen(onStartWorkout = { navController.navigate(WorkoutRoute) })
+                HomeScreen(
+                    onStartWorkout = { navController.navigate(WorkoutRoute()) },
+                    onOpenSession = { id -> navController.navigate(HistoryDetailRoute(id)) },
+                )
             }
             composable<HistoryRoute> {
                 HistoryScreen(

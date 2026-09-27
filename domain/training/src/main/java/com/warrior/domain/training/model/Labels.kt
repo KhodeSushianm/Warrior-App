@@ -35,3 +35,18 @@ val Feeling.label: String
 /** Round-based workout types carry rounds (DB v4 / preview behavior). */
 val WorkoutType.isRoundBased: Boolean
     get() = this != WorkoutType.CARDIO
+
+/**
+ * Compact list-row title shared by History and Home (Phase 7):
+ * "Heavy Bag · 6 rounds +1 more". Primary type = first activity.
+ */
+val TrainingSession.rowTitle: String
+    get() {
+        val first = activities.firstOrNull() ?: return "Session"
+        return buildString {
+            append(first.type.label)
+            if (totalRounds > 0) append(" · $totalRounds rounds")
+            val extra = activities.size - 1
+            if (extra > 0) append(" +$extra more")
+        }
+    }

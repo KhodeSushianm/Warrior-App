@@ -43,4 +43,19 @@ object DateFormats {
     /** 165 -> "2h 45m"; 45 -> "45m". */
     fun durationLabel(totalMinutes: Long): String =
         if (totalMinutes >= 60) "${totalMinutes / 60}h ${totalMinutes % 60}m" else "${totalMinutes}m"
+
+    /**
+     * "Sep 19 – Sep 25" for week headers (THIS WEEK card). [endExclusiveMillis]
+     * is the next week's start; formatting the instant *before* it yields the
+     * week's last local day even when DST shifted the boundary (Phase 7).
+     */
+    fun weekRange(
+        startMillis: Long,
+        endExclusiveMillis: Long,
+        zone: TimeZone = TimeZone.getDefault(),
+    ): String {
+        val formatter = SimpleDateFormat("MMM d", Locale.ENGLISH)
+        formatter.timeZone = zone
+        return "${formatter.format(Date(startMillis))} – ${formatter.format(Date(endExclusiveMillis - 1))}"
+    }
 }

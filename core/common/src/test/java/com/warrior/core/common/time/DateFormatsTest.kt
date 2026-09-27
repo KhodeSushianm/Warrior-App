@@ -26,4 +26,39 @@ class DateFormatsTest {
         assertEquals("45m", DateFormats.durationLabel(45))
         assertEquals("0m", DateFormats.durationLabel(0))
     }
+
+    @Test
+    fun weekRange_formatsFirstAndLastLocalDay() {
+        // Plain UTC week: Sat Sep 19 .. next Sat Sep 26 (exclusive).
+        assertEquals(
+            "Sep 19 – Sep 25",
+            DateFormats.weekRange(utcMillis(2026, 9, 19), utcMillis(2026, 9, 26), utc),
+        )
+    }
+
+    @Test
+    fun weekRange_nonUtcZoneAndDstWeek() {
+        // Asia/Tehran (+3:30): local week Sep 26 .. Oct 3.
+        val tehran = TimeZone.getTimeZone("Asia/Tehran")
+        assertEquals(
+            "Sep 26 – Oct 2",
+            DateFormats.weekRange(localMillis(tehran, 2026, 9, 26), localMillis(tehran, 2026, 10, 3), tehran),
+        )
+        // Europe/Berlin across the spring-forward: the 167h week still ends on Apr 3 local.
+        val berlin = TimeZone.getTimeZone("Europe/Berlin")
+        assertEquals(
+            "Mar 28 – Apr 3",
+            DateFormats.weekRange(localMillis(berlin, 2026, 3, 28), localMillis(berlin, 2026, 4, 4), berlin),
+        )
+    }
+
+    private fun utcMillis(year: Int, month: Int, day: Int): Long = localMillis(utc, year, month, day)
+
+    private fun localMillis(zone: TimeZone, year: Int, month: Int, day: Int): Long =
+        java.util.Calendar.getInstance(zone)
+            .apply {
+                clear()
+                set(year, month - 1, day, 0, 0, 0)
+                set(java.util.Calendar.MILLISECOND, 0)
+            }.timeInMillis
 }

@@ -80,3 +80,11 @@ val WarriorIconProfile: ImageVector = icon("warrior_icon_profile") {
     curveTo(5.5f, 16f, 8.5f, 14f, 12f, 14f)
     curveTo(15.5f, 14f, 18.5f, 16f, 20f, 21f)
 }
+
+/** Plus: "log workout" top-bar action (Phase 7, matches ui-preview). */
+val WarriorIconPlus: ImageVector = icon("warrior_icon_plus") {
+    moveTo(12f, 5f)
+    lineTo(12f, 19f)
+    moveTo(5f, 12f)
+    lineTo(19f, 12f)
+}

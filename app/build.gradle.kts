@@ -49,6 +49,7 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":data:local"))
     implementation(project(":domain:auth"))
+    implementation(project(":domain:progress"))
     implementation(project(":feature:auth"))
     implementation(project(":feature:home"))
     implementation(project(":feature:workout"))
