@@ -1,5 +1,7 @@
 package com.warrior.core.designsystem.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -69,6 +72,14 @@ fun VolumeBarChart(
 ) {
     val idleColor = SurfaceVariant
     val activeColor = Accent
+    // Phase 9 polish: bars grow/shrink smoothly when the derived flow re-emits.
+    val animatedFractions = bars.map { bar ->
+        animateFloatAsState(
+            targetValue = bar.fraction.coerceIn(0f, 1f),
+            animationSpec = tween(durationMillis = 450),
+            label = "volumeBar",
+        ).value
+    }
     Column(modifier.fillMaxWidth()) {
         Canvas(
             Modifier
@@ -80,7 +91,7 @@ fun VolumeBarChart(
             val barWidth = (size.width - gap * (bars.size - 1)) / bars.size
             val minBarHeight = 4.dp.toPx()
             bars.forEachIndexed { index, bar ->
-                val fraction = bar.fraction.coerceIn(0f, 1f)
+                val fraction = animatedFractions.getOrElse(index) { bar.fraction.coerceIn(0f, 1f) }
                 if (fraction <= 0f) return@forEachIndexed
                 val barHeight = maxOf(size.height * fraction, minBarHeight)
                 val left = index * (barWidth + gap)
@@ -193,6 +204,12 @@ fun DistributionBarRow(
     modifier: Modifier = Modifier,
 ) {
     val trackColor = SurfaceVariant
+    // Phase 9 polish: fills ease into their target width on data changes.
+    val animatedFraction by animateFloatAsState(
+        targetValue = fraction.coerceIn(0f, 1f),
+        animationSpec = tween(durationMillis = 450),
+        label = "distributionFill",
+    )
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -216,7 +233,7 @@ fun DistributionBarRow(
         ) {
             val corner = CornerRadius(size.height / 2f, size.height / 2f)
             drawRoundRect(color = trackColor, cornerRadius = corner)
-            val fillWidth = size.width * fraction.coerceIn(0f, 1f)
+            val fillWidth = size.width * animatedFraction
             if (fillWidth > 0f) {
                 drawRoundRect(
                     color = color,

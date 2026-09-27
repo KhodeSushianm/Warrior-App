@@ -14,4 +14,12 @@ interface AuthRepository {
     suspend fun login(username: String, password: String): Long
 
     suspend fun getAccount(userId: Long): LocalAccount?
+
+    /**
+     * Updates the identity fields of an existing account (Phase 9).
+     * Throws [com.warrior.domain.auth.DuplicateUsernameException] when the new
+     * username belongs to a different local account, [NoSuchElementException]
+     * when [userId] does not exist. Password is never touched here.
+     */
+    suspend fun updateAccount(userId: Long, displayName: String, username: String)
 }

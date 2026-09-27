@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,6 +26,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,9 +37,11 @@ import com.warrior.core.designsystem.components.HeatmapMonth
 import com.warrior.core.designsystem.components.TrainingHeatmapGrid
 import com.warrior.core.designsystem.components.WarriorButton
 import com.warrior.core.designsystem.components.WarriorCard
+import com.warrior.core.designsystem.components.WarriorEmptyState
+import com.warrior.core.designsystem.components.WarriorLoadingBox
+import com.warrior.core.designsystem.components.WarriorSectionHeader
 import com.warrior.core.designsystem.components.WarriorTopBar
 import com.warrior.core.designsystem.icons.WarriorIconPlus
-import com.warrior.core.designsystem.theme.Accent
 import com.warrior.core.designsystem.theme.Cardio
 import com.warrior.core.designsystem.theme.HeavyBag
 import com.warrior.core.designsystem.theme.MittWork
@@ -73,10 +76,14 @@ fun HomeScreen(
             .padding(18.dp),
     ) {
         WarriorTopBar(
-            title = "WARRIOR",
+            title = stringResource(R.string.home_wordmark),
             actions = {
                 IconButton(onClick = onStartWorkout) {
-                    Icon(WarriorIconPlus, contentDescription = "Log workout", tint = TextPrimary)
+                    Icon(
+                        WarriorIconPlus,
+                        contentDescription = stringResource(R.string.home_log_workout_cd),
+                        tint = TextPrimary,
+                    )
                 }
             },
         )
@@ -89,14 +96,7 @@ fun HomeScreen(
                 onStartWorkout = onStartWorkout,
                 onOpenSession = onOpenSession,
             )
-            !state.loaded -> Box(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(top = 120.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator(color = Accent)
-            }
+            !state.loaded -> WarriorLoadingBox()
             // Loaded with a null snapshot = signed out; root nav swaps to Auth.
         }
     }
@@ -112,7 +112,7 @@ private fun HomeContent(
     ThisWeekCard(progress, weekRangeLabel)
 
     Spacer(Modifier.height(16.dp))
-    SectionHeader("TRAINING DAYS · LAST 3 MONTHS")
+    WarriorSectionHeader(stringResource(R.string.home_heatmap_title))
     Spacer(Modifier.height(8.dp))
     WarriorCard {
         TrainingHeatmapGrid(
@@ -129,23 +129,18 @@ private fun HomeContent(
     }
 
     Spacer(Modifier.height(16.dp))
-    SectionHeader("RECENT SESSIONS")
+    WarriorSectionHeader(stringResource(R.string.home_recent_title))
     Spacer(Modifier.height(8.dp))
     RecentSessionsCard(progress.recentSessions, onOpenSession)
 
     Spacer(Modifier.height(16.dp))
-    SectionHeader("PERSONAL RECORDS")
+    WarriorSectionHeader(stringResource(R.string.home_records_title))
     Spacer(Modifier.height(8.dp))
     PersonalRecordsCard(progress)
 
     Spacer(Modifier.height(16.dp))
-    WarriorButton(text = "+ Log Workout", onClick = onStartWorkout)
+    WarriorButton(text = stringResource(R.string.home_cta_log_workout), onClick = onStartWorkout)
     Spacer(Modifier.height(8.dp))
-}
-
-@Composable
-private fun SectionHeader(text: String) {
-    Text(text, style = MaterialTheme.typography.labelSmall, color = TextMuted)
 }
 
 @Composable
@@ -154,7 +149,11 @@ private fun ThisWeekCard(progress: HomeProgress, weekRangeLabel: String) {
     val lastWeek = progress.lastWeek
     WarriorCard {
         Text(
-            if (weekRangeLabel.isEmpty()) "THIS WEEK" else "THIS WEEK · $weekRangeLabel",
+            if (weekRangeLabel.isEmpty()) {
+                stringResource(R.string.home_this_week)
+            } else {
+                stringResource(R.string.home_this_week_range, weekRangeLabel)
+            },
             style = MaterialTheme.typography.labelSmall,
             color = TextMuted,
         )
@@ -166,7 +165,7 @@ private fun ThisWeekCard(progress: HomeProgress, weekRangeLabel: String) {
             )
             Spacer(Modifier.width(8.dp))
             Text(
-                "training time",
+                stringResource(R.string.home_training_time),
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextMuted,
                 modifier = Modifier
@@ -175,24 +174,24 @@ private fun ThisWeekCard(progress: HomeProgress, weekRangeLabel: String) {
             )
             DeltaText(
                 delta = (thisWeek.trainingMinutes - lastWeek.trainingMinutes).toInt(),
-                unit = "m",
+                unit = stringResource(R.string.home_delta_unit_minutes),
             )
         }
         Spacer(Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             MiniStat(
                 value = thisWeek.sessionCount.toString(),
-                label = "SESSIONS",
+                label = stringResource(R.string.home_stat_sessions),
                 delta = thisWeek.sessionCount - lastWeek.sessionCount,
             )
             MiniStat(
                 value = thisWeek.totalRounds.toString(),
-                label = "ROUNDS",
+                label = stringResource(R.string.home_stat_rounds),
                 delta = thisWeek.totalRounds - lastWeek.totalRounds,
             )
             MiniStat(
                 value = if (thisWeek.isEmpty) "—" else thisWeek.averageIntensity.toString(),
-                label = "AVG INTENSITY",
+                label = stringResource(R.string.home_stat_avg_intensity),
                 delta = thisWeek.averageIntensity - lastWeek.averageIntensity,
             )
         }
@@ -212,12 +211,9 @@ private fun RowScope.MiniStat(value: String, label: String, delta: Int) {
 private fun RecentSessionsCard(sessions: List<TrainingSession>, onOpenSession: (Long) -> Unit) {
     WarriorCard {
         if (sessions.isEmpty()) {
-            Text("No sessions yet", style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(6.dp))
-            Text(
-                "Log your first workout and your latest sessions will show up here.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = TextMuted,
+            WarriorEmptyState(
+                title = stringResource(R.string.home_recent_empty_title),
+                body = stringResource(R.string.home_recent_empty_body),
             )
         } else {
             sessions.forEachIndexed { index, session ->
@@ -250,9 +246,12 @@ private fun RecentRow(session: TrainingSession, showDivider: Boolean, onClick: (
             Column(Modifier.weight(1f)) {
                 Text(session.rowTitle, style = MaterialTheme.typography.titleMedium)
                 Text(
-                    "${DateFormats.short(session.date)} · " +
-                        DateFormats.durationLabel(session.totalDuration.inWholeMinutes) +
-                        " · int ${session.overallIntensity}",
+                    stringResource(
+                        R.string.home_session_meta,
+                        DateFormats.short(session.date),
+                        DateFormats.durationLabel(session.totalDuration.inWholeMinutes),
+                        session.overallIntensity,
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = TextMuted,
                 )
@@ -269,14 +268,21 @@ private fun PersonalRecordsCard(progress: HomeProgress) {
     val records = progress.records
     WarriorCard {
         RecordRow(
-            label = "Longest session",
+            label = stringResource(R.string.home_record_longest),
             value = if (records.isEmpty) "—" else DateFormats.durationLabel(records.longestSessionMinutes),
         )
         RecordRow(
-            label = "Most rounds in one session",
+            label = stringResource(R.string.home_record_most_rounds),
             value = if (records.isEmpty) "—" else records.mostRoundsInSession.toString(),
         )
-        RecordRow(label = "Current streak", value = streakLabel(progress.streakWeeks))
+        RecordRow(
+            label = stringResource(R.string.home_record_streak),
+            value = if (progress.streakWeeks > 0) {
+                pluralStringResource(R.plurals.home_streak_weeks, progress.streakWeeks, progress.streakWeeks)
+            } else {
+                "—"
+            },
+        )
     }
 }
 
@@ -296,12 +302,6 @@ private fun RecordRow(label: String, value: String) {
         )
         Text(value, style = MaterialTheme.typography.titleMedium)
     }
-}
-
-private fun streakLabel(weeks: Int): String = when {
-    weeks <= 0 -> "—"
-    weeks == 1 -> "1 week"
-    else -> "$weeks weeks"
 }
 
 private fun typeColor(type: WorkoutType?) = when (type) {

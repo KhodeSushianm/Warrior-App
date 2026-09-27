@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_wordmark">WARRIOR</string>
+    <string name="home_log_workout_cd">Log workout</string>
+    <string name="home_this_week">THIS WEEK</string>
+    <string name="home_this_week_range">THIS WEEK · %1$s</string>
+    <string name="home_training_time">training time</string>
+    <string name="home_stat_sessions">SESSIONS</string>
+    <string name="home_stat_rounds">ROUNDS</string>
+    <string name="home_stat_avg_intensity">AVG INTENSITY</string>
+
+    <string name="home_heatmap_title">TRAINING DAYS · LAST 3 MONTHS</string>
+
+    <string name="home_recent_title">RECENT SESSIONS</string>
+    <string name="home_recent_empty_title">No sessions yet</string>
+    <string name="home_recent_empty_body">Log your first workout and your latest sessions will show up here.</string>
+    <string name="home_session_meta">%1$s · %2$s · int %3$d</string>
+
+    <string name="home_records_title">PERSONAL RECORDS</string>
+    <string name="home_record_longest">Longest session</string>
+    <string name="home_record_most_rounds">Most rounds in one session</string>
+    <string name="home_record_streak">Current streak</string>
+
+    <string name="home_cta_log_workout">+ Log Workout</string>
+    <string name="home_delta_unit_minutes">m</string>
+
+    <plurals name="home_streak_weeks">
+        <item quantity="one">%d week</item>
+        <item quantity="other">%d weeks</item>
+    </plurals>
+</resources>

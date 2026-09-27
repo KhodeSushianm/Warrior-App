@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">History</string>
+    <string name="history_empty_title">No sessions yet</string>
+    <string name="history_empty_body">Logged workouts group here by day, using Saturday → Friday weeks.</string>
+    <string name="history_cta_log">+ Log Workout</string>
+    <string name="history_day_today">Today</string>
+    <string name="history_day_yesterday">Yesterday</string>
+    <string name="history_session_meta">%1$s · %2$s · felt %3$s</string>
+    <string name="history_intensity_badge">INT %1$d</string>
+
+    <string name="history_detail_title">Session Detail</string>
+    <string name="history_detail_not_found">Session not found</string>
+    <string name="history_detail_header_meta">%1$s · %2$s · int %3$d/10 · felt %4$s</string>
+    <string name="history_detail_activity_meta">%1$s · %2$s · int %3$d/10</string>
+    <string name="history_detail_round_line">R%1$d %2$d:00 work / %3$d:00 rest · int %4$d</string>
+
+    <string name="history_action_edit">Edit Session</string>
+    <string name="history_action_delete">Delete Session</string>
+    <string name="history_delete_title">Delete this session?</string>
+    <string name="history_delete_body">Activities and rounds are deleted with it. This cannot be undone.</string>
+    <string name="history_delete_confirm">Delete</string>
+    <string name="history_cancel">Cancel</string>
+
+    <plurals name="history_rounds_count">
+        <item quantity="one">%d round</item>
+        <item quantity="other">%d rounds</item>
+    </plurals>
+</resources>

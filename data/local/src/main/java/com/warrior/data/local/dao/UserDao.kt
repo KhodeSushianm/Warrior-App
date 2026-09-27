@@ -30,6 +30,16 @@ interface UserDao {
     )
     suspend fun getByUsername(username: String): UserEntity?
 
+    /** Identity-only update (Phase 9): password hash/salt are never touched here. */
+    @Query(
+        """
+        UPDATE users
+        SET displayName = :displayName, username = :username, updatedAt = :updatedAt
+        WHERE id = :id
+        """,
+    )
+    suspend fun updateProfile(id: Long, displayName: String, username: String, updatedAt: Long): Int
+
     @Query(
         """
         SELECT * FROM users

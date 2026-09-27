@@ -44,4 +44,11 @@ class FakeAuthRepository : AuthRepository {
 
     override suspend fun getAccount(userId: Long): LocalAccount? =
         rows[userId]?.let { LocalAccount(it.id, it.username, it.displayName) }
+
+    override suspend fun updateAccount(userId: Long, displayName: String, username: String) {
+        val current = rows[userId] ?: throw NoSuchElementException("user $userId not found")
+        val clash = rows.values.firstOrNull { it.username == username && it.id != userId }
+        if (clash != null) throw DuplicateUsernameException(username)
+        rows[userId] = current.copy(displayName = displayName, username = username)
+    }
 }

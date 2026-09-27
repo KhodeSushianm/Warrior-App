@@ -72,4 +72,41 @@ class AuthRepositoryTest {
             runCatching { repository.login("ghost", "password123") }.exceptionOrNull() is InvalidCredentialsException,
         )
     }
+
+    @Test
+    fun updateAccount_persistsIdentityAndKeepsPassword() = runTest {
+        val id = repository.register("warrior", "The Warrior", "password123")
+
+        repository.updateAccount(id, "Renamed", "new_name")
+
+        val account = repository.getAccount(id)!!
+        assertEquals("Renamed", account.displayName)
+        assertEquals("new_name", account.username)
+        // password untouched: old credentials still verify, with the new username
+        assertEquals(id, repository.login("new_name", "password123"))
+    }
+
+    @Test
+    fun updateAccount_usernameClash_fails() = runTest {
+        val first = repository.register("alpha", "A", "password123")
+        repository.register("beta", "B", "password123")
+
+        val result = runCatching { repository.updateAccount(first, "A", "BETA") }
+        assertTrue(result.exceptionOrNull() is DuplicateUsernameException)
+        assertEquals("alpha", repository.getAccount(first)?.username)
+    }
+
+    @Test
+    fun updateAccount_sameUserKeepsOwnUsername() = runTest {
+        val id = repository.register("warrior", "Old", "password123")
+        repository.updateAccount(id, "New", "WARRIOR") // case-normalized to itself
+        assertEquals("New", repository.getAccount(id)?.displayName)
+        assertEquals("warrior", repository.getAccount(id)?.username)
+    }
+
+    @Test
+    fun updateAccount_unknownUser_fails() = runTest {
+        val result = runCatching { repository.updateAccount(999, "Name", "ok_1") }
+        assertTrue(result.exceptionOrNull() is NoSuchElementException)
+    }
 }

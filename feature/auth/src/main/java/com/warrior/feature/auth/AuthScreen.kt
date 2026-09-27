@@ -1,5 +1,6 @@
 package com.warrior.feature.auth
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -22,6 +24,7 @@ import com.warrior.core.designsystem.components.WarriorButtonVariant
 import com.warrior.core.designsystem.components.WarriorTextField
 import com.warrior.core.designsystem.theme.Negative
 import com.warrior.core.designsystem.theme.TextMuted
+import com.warrior.domain.auth.validation.AuthErrorCode
 
 @Composable
 fun AuthScreen(
@@ -39,9 +42,9 @@ fun AuthScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(56.dp))
-        Text("WARRIOR", style = MaterialTheme.typography.displayLarge)
+        Text(stringResource(R.string.auth_wordmark), style = MaterialTheme.typography.displayLarge)
         Text(
-            "LOG · TRACK · ANALYZE · IMPROVE",
+            stringResource(R.string.auth_tagline),
             style = MaterialTheme.typography.labelSmall,
             color = TextMuted,
         )
@@ -51,41 +54,47 @@ fun AuthScreen(
             WarriorTextField(
                 value = state.displayName,
                 onValueChange = viewModel::onDisplayNameChange,
-                label = "Display name",
+                label = stringResource(R.string.auth_field_display_name),
             )
             Spacer(Modifier.height(10.dp))
         }
         WarriorTextField(
             value = state.username,
             onValueChange = viewModel::onUsernameChange,
-            label = "Username",
+            label = stringResource(R.string.auth_field_username),
         )
         Spacer(Modifier.height(10.dp))
         WarriorTextField(
             value = state.password,
             onValueChange = viewModel::onPasswordChange,
-            label = "Password",
+            label = stringResource(R.string.auth_field_password),
             isPassword = true,
         )
 
-        if (state.errors.isNotEmpty()) {
+        if (state.errorCodes.isNotEmpty()) {
             Spacer(Modifier.height(12.dp))
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                state.errors.forEach { message ->
-                    Text(message, color = Negative, style = MaterialTheme.typography.labelLarge)
+                state.errorCodes.forEach { code ->
+                    Text(
+                        stringResource(code.labelRes),
+                        color = Negative,
+                        style = MaterialTheme.typography.labelLarge,
+                    )
                 }
             }
         }
 
         Spacer(Modifier.height(20.dp))
         WarriorButton(
-            text = if (isRegister) "Create Account" else "Log In",
+            text = stringResource(if (isRegister) R.string.auth_action_register else R.string.auth_action_login),
             onClick = viewModel::onSubmit,
             enabled = !state.isSubmitting,
         )
         Spacer(Modifier.height(10.dp))
         WarriorButton(
-            text = if (isRegister) "Back to Login" else "Create Account",
+            text = stringResource(
+                if (isRegister) R.string.auth_action_back_to_login else R.string.auth_action_register,
+            ),
             onClick = viewModel::onToggleMode,
             variant = WarriorButtonVariant.GHOST,
             enabled = !state.isSubmitting,
@@ -93,9 +102,23 @@ fun AuthScreen(
 
         Spacer(Modifier.height(24.dp))
         Text(
-            "Local-only account — your data never leaves this device.",
+            stringResource(R.string.auth_local_only_note),
             style = MaterialTheme.typography.bodyMedium,
             color = TextMuted,
         )
     }
 }
+
+/** Error code -> localized copy (Phase 9: no hardcoded UI strings). */
+private val AuthErrorCode.labelRes: Int
+    @StringRes
+    get() = when (this) {
+        AuthErrorCode.USERNAME_FORMAT -> R.string.auth_error_username_format
+        AuthErrorCode.DISPLAY_NAME_INVALID -> R.string.auth_error_display_name_invalid
+        AuthErrorCode.PASSWORD_TOO_SHORT -> R.string.auth_error_password_too_short
+        AuthErrorCode.USERNAME_BLANK -> R.string.auth_error_username_blank
+        AuthErrorCode.PASSWORD_EMPTY -> R.string.auth_error_password_empty
+        AuthErrorCode.DUPLICATE_USERNAME -> R.string.auth_error_duplicate_username
+        AuthErrorCode.INVALID_CREDENTIALS -> R.string.auth_error_invalid_credentials
+        AuthErrorCode.UNEXPECTED -> R.string.auth_error_unexpected
+    }

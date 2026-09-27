@@ -16,6 +16,7 @@ import com.warrior.domain.training.usecase.CreateTrainingSession
 import com.warrior.domain.training.usecase.DeleteTrainingSession
 import com.warrior.domain.training.usecase.GetTrainingSession
 import com.warrior.domain.training.usecase.UpdateTrainingSession
+import com.warrior.domain.training.validation.TrainingErrorCode
 import com.warrior.domain.training.validation.ValidationException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,7 +55,7 @@ class WorkoutLoggingViewModel @Inject constructor(
         val notes: String = "",
         val activities: List<WorkoutActivity> = emptyList(),
         val isSaving: Boolean = false,
-        val errors: List<String> = emptyList(),
+        val errorCodes: List<TrainingErrorCode> = emptyList(),
         val isSaved: Boolean = false,
         val isDeleted: Boolean = false,
         val showDeleteConfirm: Boolean = false,
@@ -85,18 +86,18 @@ class WorkoutLoggingViewModel @Inject constructor(
         }
     }
 
-    fun onIntensityChange(value: Int) = _state.update { it.copy(overallIntensity = value, errors = emptyList()) }
+    fun onIntensityChange(value: Int) = _state.update { it.copy(overallIntensity = value, errorCodes = emptyList()) }
 
-    fun onFeelingChange(value: Feeling) = _state.update { it.copy(feeling = value, errors = emptyList()) }
+    fun onFeelingChange(value: Feeling) = _state.update { it.copy(feeling = value, errorCodes = emptyList()) }
 
-    fun onNotesChange(value: String) = _state.update { it.copy(notes = value, errors = emptyList()) }
+    fun onNotesChange(value: String) = _state.update { it.copy(notes = value, errorCodes = emptyList()) }
 
     fun onNextStep() = _state.update {
-        it.copy(step = if (it.step == Step.SESSION) Step.ACTIVITIES else Step.REVIEW, errors = emptyList())
+        it.copy(step = if (it.step == Step.SESSION) Step.ACTIVITIES else Step.REVIEW, errorCodes = emptyList())
     }
 
     fun onPreviousStep() = _state.update {
-        it.copy(step = if (it.step == Step.REVIEW) Step.ACTIVITIES else Step.SESSION, errors = emptyList())
+        it.copy(step = if (it.step == Step.REVIEW) Step.ACTIVITIES else Step.SESSION, errorCodes = emptyList())
     }
 
     fun onAddActivity() = _state.update {
@@ -108,12 +109,12 @@ class WorkoutLoggingViewModel @Inject constructor(
                 focusArea = FocusArea.POWER,
                 rounds = defaultRounds(),
             ),
-            errors = emptyList(),
+            errorCodes = emptyList(),
         )
     }
 
     fun onRemoveActivity(index: Int) = _state.update {
-        it.copy(activities = it.activities.filterIndexed { i, _ -> i != index }, errors = emptyList())
+        it.copy(activities = it.activities.filterIndexed { i, _ -> i != index }, errorCodes = emptyList())
     }
 
     fun onActivityTypeChange(index: Int, type: WorkoutType) = updateActivity(index) { activity ->
@@ -177,10 +178,10 @@ class WorkoutLoggingViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = observeSession().first()
             if (userId == null) {
-                _state.update { it.copy(errors = listOf("not signed in")) }
+                _state.update { it.copy(errorCodes = listOf(TrainingErrorCode.NOT_SIGNED_IN)) }
                 return@launch
             }
-            _state.update { it.copy(isSaving = true, errors = emptyList()) }
+            _state.update { it.copy(isSaving = true, errorCodes = emptyList()) }
             val draft = buildDraft()
             val result = if (draft.id == 0L) {
                 createTrainingSession(userId, draft)
@@ -193,7 +194,11 @@ class WorkoutLoggingViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             isSaving = false,
-                            errors = if (error is ValidationException) error.messages else listOf(error.message ?: "save failed"),
+                            errorCodes = when (error) {
+                                is ValidationException -> error.codes.ifEmpty { listOf(TrainingErrorCode.UNEXPECTED) }
+                                is NoSuchElementException -> listOf(TrainingErrorCode.SESSION_NOT_FOUND)
+                                else -> listOf(TrainingErrorCode.SAVE_FAILED)
+                            },
                         )
                     }
                 }
@@ -230,7 +235,7 @@ class WorkoutLoggingViewModel @Inject constructor(
                 activities = it.activities.mapIndexed { i, activity ->
                     if (i == index) transform(activity) else activity
                 },
-                errors = emptyList(),
+                errorCodes = emptyList(),
             )
         }
 

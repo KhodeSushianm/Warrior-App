@@ -2,7 +2,6 @@ package com.warrior.feature.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.warrior.core.common.time.DateFormats
 import com.warrior.domain.auth.usecase.ObserveSession
 import com.warrior.domain.training.model.TrainingSession
 import com.warrior.domain.training.usecase.DeleteTrainingSession
@@ -27,7 +26,6 @@ class HistoryViewModel @Inject constructor(
 
     data class DayGroup(
         val key: Long,
-        val label: String,
         val sessions: List<TrainingSession>,
     )
 
@@ -55,7 +53,6 @@ class HistoryViewModel @Inject constructor(
                                 .map { (date, list) ->
                                     DayGroup(
                                         key = date,
-                                        label = DateFormats.dayHeader(date),
                                         sessions = list.sortedByDescending { it.createdAt },
                                     )
                                 },

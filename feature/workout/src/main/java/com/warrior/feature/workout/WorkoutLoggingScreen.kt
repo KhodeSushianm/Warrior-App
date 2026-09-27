@@ -1,5 +1,6 @@
 package com.warrior.feature.workout
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,9 +22,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.warrior.core.common.time.DateFormats
 import com.warrior.core.designsystem.components.WarriorBadge
 import com.warrior.core.designsystem.components.WarriorButton
 import com.warrior.core.designsystem.components.WarriorButtonVariant
@@ -38,6 +41,7 @@ import com.warrior.domain.training.model.FocusArea
 import com.warrior.domain.training.model.WorkoutType
 import com.warrior.domain.training.model.isRoundBased
 import com.warrior.domain.training.model.label
+import com.warrior.domain.training.validation.TrainingErrorCode
 
 @Composable
 fun WorkoutLoggingScreen(
@@ -62,9 +66,12 @@ fun WorkoutLoggingScreen(
     ) {
         WarriorTopBar(
             title = when (state.step) {
-                WorkoutLoggingViewModel.Step.SESSION -> if (state.sessionId == null) "New Session" else "Edit Session"
-                WorkoutLoggingViewModel.Step.ACTIVITIES -> "Activities"
-                WorkoutLoggingViewModel.Step.REVIEW -> "Review & Save"
+                WorkoutLoggingViewModel.Step.SESSION ->
+                    stringResource(
+                        if (state.sessionId == null) R.string.workout_title_new else R.string.workout_title_edit,
+                    )
+                WorkoutLoggingViewModel.Step.ACTIVITIES -> stringResource(R.string.workout_step_activities)
+                WorkoutLoggingViewModel.Step.REVIEW -> stringResource(R.string.workout_step_review)
             },
             navigationIcon = {
                 Text(
@@ -83,7 +90,7 @@ fun WorkoutLoggingScreen(
             },
             actions = {
                 if (state.sessionId != null) {
-                    WarriorBadge(text = "EDIT", highlight = true)
+                    WarriorBadge(text = stringResource(R.string.workout_badge_edit), highlight = true)
                 }
             },
         )
@@ -97,36 +104,40 @@ fun WorkoutLoggingScreen(
             WorkoutLoggingViewModel.Step.REVIEW -> ReviewStep(state, viewModel)
         }
 
-        if (state.errors.isNotEmpty()) {
+        if (state.errorCodes.isNotEmpty()) {
             Spacer(Modifier.height(10.dp))
-            state.errors.forEach { message ->
-                Text(message, color = Negative, style = MaterialTheme.typography.labelLarge)
+            state.errorCodes.forEach { code ->
+                Text(stringResource(code.labelRes), color = Negative, style = MaterialTheme.typography.labelLarge)
             }
         }
 
         Spacer(Modifier.height(16.dp))
         when (state.step) {
             WorkoutLoggingViewModel.Step.SESSION ->
-                WarriorButton(text = "Continue →", onClick = viewModel::onNextStep)
+                WarriorButton(text = stringResource(R.string.workout_action_continue), onClick = viewModel::onNextStep)
             WorkoutLoggingViewModel.Step.ACTIVITIES -> {
-                WarriorButton(text = "+ Add Activity", onClick = viewModel::onAddActivity, variant = WarriorButtonVariant.GHOST)
+                WarriorButton(
+                    text = stringResource(R.string.workout_action_add_activity),
+                    onClick = viewModel::onAddActivity,
+                    variant = WarriorButtonVariant.GHOST,
+                )
                 Spacer(Modifier.height(10.dp))
                 WarriorButton(
-                    text = "Continue →",
+                    text = stringResource(R.string.workout_action_continue),
                     onClick = viewModel::onNextStep,
                     enabled = state.activities.isNotEmpty(),
                 )
             }
             WorkoutLoggingViewModel.Step.REVIEW -> {
                 WarriorButton(
-                    text = if (state.isSaving) "Saving…" else "Save Session",
+                    text = stringResource(if (state.isSaving) R.string.workout_action_saving else R.string.workout_action_save),
                     onClick = viewModel::onSave,
                     enabled = !state.isSaving,
                 )
                 if (state.sessionId != null) {
                     Spacer(Modifier.height(10.dp))
                     WarriorButton(
-                        text = "Delete Session",
+                        text = stringResource(R.string.workout_action_delete_session),
                         onClick = { viewModel.onDeleteConfirmRequest(true) },
                         variant = WarriorButtonVariant.DANGER,
                     )
@@ -139,17 +150,39 @@ fun WorkoutLoggingScreen(
     if (state.showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { viewModel.onDeleteConfirmRequest(false) },
-            title = { Text("Delete this session?") },
-            text = { Text("Activities and rounds are deleted with it. This cannot be undone.") },
+            title = { Text(stringResource(R.string.workout_delete_title)) },
+            text = { Text(stringResource(R.string.workout_delete_body)) },
             confirmButton = {
-                TextButton(onClick = viewModel::onDeleteSession) { Text("Delete", color = Negative) }
+                TextButton(onClick = viewModel::onDeleteSession) {
+                    Text(stringResource(R.string.workout_delete_confirm), color = Negative)
+                }
             },
             dismissButton = {
-                TextButton(onClick = { viewModel.onDeleteConfirmRequest(false) }) { Text("Cancel") }
+                TextButton(onClick = { viewModel.onDeleteConfirmRequest(false) }) {
+                    Text(stringResource(R.string.workout_cancel))
+                }
             },
         )
     }
 }
+
+/** Error code -> localized copy (Phase 9: no hardcoded UI strings). */
+private val TrainingErrorCode.labelRes: Int
+    @StringRes
+    get() = when (this) {
+        TrainingErrorCode.OVERALL_INTENSITY_RANGE -> R.string.workout_error_overall_intensity_range
+        TrainingErrorCode.NO_ACTIVITIES -> R.string.workout_error_no_activities
+        TrainingErrorCode.ACTIVITY_DURATION_POSITIVE -> R.string.workout_error_activity_duration
+        TrainingErrorCode.ACTIVITY_INTENSITY_RANGE -> R.string.workout_error_activity_intensity
+        TrainingErrorCode.ROUND_NUMBER_POSITIVE -> R.string.workout_error_round_number
+        TrainingErrorCode.ROUND_DURATION_POSITIVE -> R.string.workout_error_round_duration
+        TrainingErrorCode.ROUND_REST_NON_NEGATIVE -> R.string.workout_error_round_rest
+        TrainingErrorCode.ROUND_INTENSITY_RANGE -> R.string.workout_error_round_intensity
+        TrainingErrorCode.SESSION_NOT_FOUND -> R.string.workout_error_session_not_found
+        TrainingErrorCode.NOT_SIGNED_IN -> R.string.workout_error_not_signed_in
+        TrainingErrorCode.SAVE_FAILED -> R.string.workout_error_save_failed
+        TrainingErrorCode.UNEXPECTED -> R.string.workout_error_unexpected
+    }
 
 @Composable
 private fun StepIndicator(step: WorkoutLoggingViewModel.Step) {
@@ -162,7 +195,11 @@ private fun StepIndicator(step: WorkoutLoggingViewModel.Step) {
                     .height(4.dp),
             ) {
                 drawRoundRect(
-                    color = if (on) com.warrior.core.designsystem.theme.Accent else com.warrior.core.designsystem.theme.SurfaceVariant,
+                    color = if (on) {
+                        com.warrior.core.designsystem.theme.Accent
+                    } else {
+                        com.warrior.core.designsystem.theme.SurfaceVariant
+                    },
                     cornerRadius = androidx.compose.ui.geometry.CornerRadius(99f),
                 )
             }
@@ -173,10 +210,10 @@ private fun StepIndicator(step: WorkoutLoggingViewModel.Step) {
 @Composable
 private fun SessionStep(state: WorkoutLoggingViewModel.UiState, viewModel: WorkoutLoggingViewModel) {
     WarriorCard {
-        Text("DATE", style = MaterialTheme.typography.labelSmall, color = TextMuted)
-        Text("Today", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.workout_label_date), style = MaterialTheme.typography.labelSmall, color = TextMuted)
+        Text(stringResource(R.string.workout_value_today), style = MaterialTheme.typography.titleMedium)
         Text(
-            "Overall intensity — ${state.overallIntensity}/10",
+            stringResource(R.string.workout_overall_intensity, state.overallIntensity),
             style = MaterialTheme.typography.labelLarge,
             color = TextMuted,
             modifier = Modifier.padding(top = 12.dp),
@@ -187,7 +224,7 @@ private fun SessionStep(state: WorkoutLoggingViewModel.UiState, viewModel: Worko
             valueRange = 1f..10f,
             steps = 8,
         )
-        Text("FEELING", style = MaterialTheme.typography.labelSmall, color = TextMuted)
+        Text(stringResource(R.string.workout_label_feeling), style = MaterialTheme.typography.labelSmall, color = TextMuted)
         Spacer(Modifier.height(6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
             Feeling.entries.forEach { feeling ->
@@ -199,7 +236,11 @@ private fun SessionStep(state: WorkoutLoggingViewModel.UiState, viewModel: Worko
             }
         }
         Spacer(Modifier.height(12.dp))
-        WarriorTextField(value = state.notes, onValueChange = viewModel::onNotesChange, label = "Notes")
+        WarriorTextField(
+            value = state.notes,
+            onValueChange = viewModel::onNotesChange,
+            label = stringResource(R.string.workout_field_notes),
+        )
     }
 }
 
@@ -207,9 +248,13 @@ private fun SessionStep(state: WorkoutLoggingViewModel.UiState, viewModel: Worko
 private fun ActivitiesStep(state: WorkoutLoggingViewModel.UiState, viewModel: WorkoutLoggingViewModel) {
     if (state.activities.isEmpty()) {
         WarriorCard {
-            Text("No activities yet", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.workout_empty_activities_title), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(6.dp))
-            Text("Add heavy bag, mitt work, sparring or cardio blocks.", style = MaterialTheme.typography.bodyMedium, color = TextMuted)
+            Text(
+                stringResource(R.string.workout_empty_activities_body),
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextMuted,
+            )
         }
     }
     state.activities.forEachIndexed { index, activity ->
@@ -225,15 +270,20 @@ private fun ActivitiesStep(state: WorkoutLoggingViewModel.UiState, viewModel: Wo
             }
             Spacer(Modifier.height(10.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Duration", style = MaterialTheme.typography.labelLarge, color = TextMuted, modifier = Modifier.weight(1f))
+                Text(
+                    stringResource(R.string.workout_label_duration),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = TextMuted,
+                    modifier = Modifier.weight(1f),
+                )
                 Stepper(
-                    label = activity.duration.inWholeMinutes.toString() + " min",
+                    label = stringResource(R.string.workout_stepper_minutes, activity.duration.inWholeMinutes.toInt()),
                     onMinus = { viewModel.onActivityDurationChange(index, -5) },
                     onPlus = { viewModel.onActivityDurationChange(index, 5) },
                 )
             }
             Text(
-                "Intensity — ${activity.intensity}/10",
+                stringResource(R.string.workout_activity_intensity, activity.intensity),
                 style = MaterialTheme.typography.labelLarge,
                 color = TextMuted,
                 modifier = Modifier.padding(top = 8.dp),
@@ -244,7 +294,7 @@ private fun ActivitiesStep(state: WorkoutLoggingViewModel.UiState, viewModel: Wo
                 valueRange = 1f..10f,
                 steps = 8,
             )
-            Text("FOCUS", style = MaterialTheme.typography.labelSmall, color = TextMuted)
+            Text(stringResource(R.string.workout_label_focus), style = MaterialTheme.typography.labelSmall, color = TextMuted)
             Spacer(Modifier.height(6.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
                 FocusArea.entries.forEach { focus ->
@@ -258,34 +308,49 @@ private fun ActivitiesStep(state: WorkoutLoggingViewModel.UiState, viewModel: Wo
             if (activity.type.isRoundBased) {
                 Spacer(Modifier.height(10.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Rounds — ${activity.rounds.size}", style = MaterialTheme.typography.labelLarge, color = TextMuted, modifier = Modifier.weight(1f))
-                    TextButton(onClick = { viewModel.onAddRound(index) }) { Text("+ round") }
+                    Text(
+                        stringResource(R.string.workout_rounds_count, activity.rounds.size),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = TextMuted,
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextButton(onClick = { viewModel.onAddRound(index) }) {
+                        Text(stringResource(R.string.workout_add_round))
+                    }
                 }
                 activity.rounds.forEachIndexed { roundIndex, round ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(top = 4.dp),
                     ) {
-                        Text("R${round.roundNumber}", style = MaterialTheme.typography.labelLarge, modifier = Modifier.width(30.dp))
+                        Text(
+                            stringResource(R.string.workout_round_label, round.roundNumber),
+                            style = MaterialTheme.typography.labelLarge,
+                            modifier = Modifier.width(30.dp),
+                        )
                         Stepper(
-                            label = "${round.duration.inWholeMinutes}m work",
+                            label = stringResource(R.string.workout_round_work, round.duration.inWholeMinutes.toInt()),
                             onMinus = { viewModel.onRoundWorkChange(index, roundIndex, -1) },
                             onPlus = { viewModel.onRoundWorkChange(index, roundIndex, 1) },
                         )
                         Spacer(Modifier.width(8.dp))
                         Stepper(
-                            label = "${round.restDuration.inWholeMinutes}m rest",
+                            label = stringResource(R.string.workout_round_rest, round.restDuration.inWholeMinutes.toInt()),
                             onMinus = { viewModel.onRoundRestChange(index, roundIndex, -1) },
                             onPlus = { viewModel.onRoundRestChange(index, roundIndex, 1) },
                         )
                         Spacer(Modifier.weight(1f))
-                        Text("✕", color = TextMuted, modifier = Modifier.clickable { viewModel.onRemoveRound(index, roundIndex) })
+                        Text(
+                            "✕",
+                            color = TextMuted,
+                            modifier = Modifier.clickable { viewModel.onRemoveRound(index, roundIndex) },
+                        )
                     }
                 }
             }
             Spacer(Modifier.height(8.dp))
             Text(
-                "✕ remove activity",
+                stringResource(R.string.workout_remove_activity),
                 color = TextMuted,
                 style = MaterialTheme.typography.labelLarge,
                 modifier = Modifier.clickable { viewModel.onRemoveActivity(index) },
@@ -300,12 +365,15 @@ private fun ReviewStep(state: WorkoutLoggingViewModel.UiState, viewModel: Workou
     val totalMinutes = state.activities.sumOf { it.duration.inWholeMinutes }
     val totalRounds = state.activities.sumOf { it.rounds.size }
     WarriorCard {
-        KeyValue("Date", "Today")
-        KeyValue("Activities", state.activities.size.toString())
-        KeyValue("Total duration", "${totalMinutes / 60}h ${totalMinutes % 60}m")
-        KeyValue("Rounds", totalRounds.toString())
-        KeyValue("Overall intensity", "${state.overallIntensity}/10")
-        KeyValue("Feeling", state.feeling.label)
+        KeyValue(stringResource(R.string.workout_review_date), stringResource(R.string.workout_value_today))
+        KeyValue(stringResource(R.string.workout_review_activities), state.activities.size.toString())
+        KeyValue(stringResource(R.string.workout_review_total_duration), DateFormats.durationLabel(totalMinutes))
+        KeyValue(stringResource(R.string.workout_review_rounds), totalRounds.toString())
+        KeyValue(
+            stringResource(R.string.workout_review_intensity),
+            stringResource(R.string.workout_review_intensity_value, state.overallIntensity),
+        )
+        KeyValue(stringResource(R.string.workout_review_feeling), state.feeling.label)
     }
     Spacer(Modifier.height(10.dp))
     WarriorCard {
@@ -313,11 +381,24 @@ private fun ReviewStep(state: WorkoutLoggingViewModel.UiState, viewModel: Workou
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        activity.type.label + if (activity.rounds.isNotEmpty()) " · ${activity.rounds.size} rounds" else "",
+                        if (activity.rounds.isNotEmpty()) {
+                            stringResource(
+                                R.string.workout_activity_title_with_rounds,
+                                activity.type.label,
+                                activity.rounds.size,
+                            )
+                        } else {
+                            activity.type.label
+                        },
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
-                        "${activity.focusArea.label} · ${activity.duration.inWholeMinutes}m · int ${activity.intensity}",
+                        stringResource(
+                            R.string.workout_review_activity_meta,
+                            activity.focusArea.label,
+                            activity.duration.inWholeMinutes.toInt(),
+                            activity.intensity,
+                        ),
                         style = MaterialTheme.typography.labelSmall,
                         color = TextMuted,
                     )

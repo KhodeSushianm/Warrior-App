@@ -19,18 +19,29 @@ object DateFormats {
 
     private fun shortFormatter() = SimpleDateFormat("EEE, MMM d", Locale.ENGLISH)
 
-    /** "Today" / "Yesterday" / "Fri, Sep 25, 2026" — used for history day headers. */
+    /**
+     * "Today" / "Yesterday" / "Fri, Sep 25, 2026" — used for history day headers.
+     * Phase 9 (i18n-ready): the two relative labels are passed in from UI string
+     * resources instead of being hardcoded here; only the absolute date stays a
+     * locale-format concern of this utility.
+     */
     fun dayHeader(
         dateUtcMillis: Long,
         now: Long = System.currentTimeMillis(),
         zone: TimeZone = TimeZone.getDefault(),
+        todayLabel: String,
+        yesterdayLabel: String,
     ): String {
         val today = TimeUtils.localDayMidnightUtcMillis(now, zone)
         val day = TimeUtils.localDayMidnightUtcMillis(dateUtcMillis, zone)
         return when (day) {
-            today -> "Today"
-            today - DAY_MS -> "Yesterday"
-            else -> fullFormatter().format(Date(day))
+            today -> todayLabel
+            today - DAY_MS -> yesterdayLabel
+            else -> {
+                val formatter = fullFormatter()
+                formatter.timeZone = zone
+                formatter.format(Date(day))
+            }
         }
     }
 

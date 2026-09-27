@@ -5,6 +5,7 @@ import com.warrior.domain.auth.usecase.GetAccount
 import com.warrior.domain.auth.usecase.Login
 import com.warrior.domain.auth.usecase.Logout
 import com.warrior.domain.auth.usecase.ObserveSession
+import com.warrior.domain.auth.usecase.UpdateAccount
 import com.warrior.domain.auth.validation.AuthValidationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -84,5 +85,44 @@ class AuthUseCasesTest {
     @Test
     fun observeSession_emitsNullInitially() = runTest {
         assertNull(ObserveSession(session)().first())
+    }
+
+    @Test
+    fun updateAccount_editsIdentityAndNormalizesUsername() = runTest {
+        val id = register("warrior", "The Warrior", "password123").getOrThrow()
+        UpdateAccount(repository)(id, "  Renamed  ", "  New_Name ").getOrThrow()
+
+        val account = GetAccount(repository)(id)!!
+        assertEquals("Renamed", account.displayName)
+        assertEquals("new_name", account.username)
+        // login still works with the new username and the original password
+        session.clear()
+        assertEquals(id, login("new_name", "password123").getOrThrow())
+    }
+
+    @Test
+    fun updateAccount_duplicateUsername_fails() = runTest {
+        val first = register("alpha", "A", "password123").getOrThrow()
+        register("beta", "B", "password123").getOrThrow()
+
+        val result = UpdateAccount(repository)(first, "A", "beta")
+        assertTrue(result.exceptionOrNull() is DuplicateUsernameException)
+        // unchanged after the failed attempt
+        assertEquals("alpha", GetAccount(repository)(first)?.username)
+    }
+
+    @Test
+    fun updateAccount_sameUsernameDifferentCase_isNotADuplicate() = runTest {
+        val id = register("warrior", "Old Name", "password123").getOrThrow()
+        UpdateAccount(repository)(id, "New Name", "WARRIOR").getOrThrow()
+        assertEquals("New Name", GetAccount(repository)(id)?.displayName)
+    }
+
+    @Test
+    fun updateAccount_invalidInput_fails() = runTest {
+        val id = register("warrior", "Name", "password123").getOrThrow()
+        assertTrue(UpdateAccount(repository)(id, " ", "warrior").isFailure)
+        assertTrue(UpdateAccount(repository)(id, "Name", "x").isFailure)
+        assertTrue(UpdateAccount(repository)(userId = 999, displayName = "Name", username = "ok_1").isFailure)
     }
 }

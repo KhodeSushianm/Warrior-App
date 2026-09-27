@@ -16,6 +16,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,7 +53,7 @@ fun HistoryDetailScreen(
             .padding(18.dp),
     ) {
         WarriorTopBar(
-            title = "Session Detail",
+            title = stringResource(R.string.history_detail_title),
             navigationIcon = {
                 Text(
                     "←",
@@ -66,7 +68,7 @@ fun HistoryDetailScreen(
         val session = state.session
         if (session == null) {
             if (state.loaded) {
-                WarriorCard { Text("Session not found", style = MaterialTheme.typography.titleMedium) }
+                WarriorCard { Text(stringResource(R.string.history_detail_not_found), style = MaterialTheme.typography.titleMedium) }
             }
         } else {
             HeaderCard(session)
@@ -77,7 +79,12 @@ fun HistoryDetailScreen(
                         Column(Modifier.weight(1f)) {
                             Text(activity.type.label, style = MaterialTheme.typography.titleMedium)
                             Text(
-                                "${activity.focusArea.label} · ${DateFormats.durationLabel(activity.duration.inWholeMinutes)} · int ${activity.intensity}/10",
+                                stringResource(
+                                    R.string.history_detail_activity_meta,
+                                    activity.focusArea.label,
+                                    DateFormats.durationLabel(activity.duration.inWholeMinutes),
+                                    activity.intensity,
+                                ),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = TextMuted,
                             )
@@ -92,7 +99,13 @@ fun HistoryDetailScreen(
                         Spacer(Modifier.height(8.dp))
                         activity.rounds.forEach { round ->
                             Text(
-                                "R${round.roundNumber}  ${round.duration.inWholeMinutes}:00 work / ${round.restDuration.inWholeMinutes}:00 rest · int ${round.intensity}",
+                                stringResource(
+                                    R.string.history_detail_round_line,
+                                    round.roundNumber,
+                                    round.duration.inWholeMinutes.toInt(),
+                                    round.restDuration.inWholeMinutes.toInt(),
+                                    round.intensity,
+                                ),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = TextMuted,
                                 modifier = Modifier.padding(vertical = 2.dp),
@@ -102,10 +115,14 @@ fun HistoryDetailScreen(
                 }
                 Spacer(Modifier.height(10.dp))
             }
-            WarriorButton(text = "Edit Session", onClick = { onEdit(session.id) }, variant = WarriorButtonVariant.GHOST)
+            WarriorButton(
+                text = stringResource(R.string.history_action_edit),
+                onClick = { onEdit(session.id) },
+                variant = WarriorButtonVariant.GHOST,
+            )
             Spacer(Modifier.height(10.dp))
             WarriorButton(
-                text = "Delete Session",
+                text = stringResource(R.string.history_action_delete),
                 onClick = { viewModel.onDeleteConfirmRequest(true) },
                 variant = WarriorButtonVariant.DANGER,
             )
@@ -116,13 +133,17 @@ fun HistoryDetailScreen(
     if (state.showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { viewModel.onDeleteConfirmRequest(false) },
-            title = { Text("Delete this session?") },
-            text = { Text("Activities and rounds are deleted with it. This cannot be undone.") },
+            title = { Text(stringResource(R.string.history_delete_title)) },
+            text = { Text(stringResource(R.string.history_delete_body)) },
             confirmButton = {
-                TextButton(onClick = viewModel::onConfirmDelete) { Text("Delete", color = Negative) }
+                TextButton(onClick = viewModel::onConfirmDelete) {
+                    Text(stringResource(R.string.history_delete_confirm), color = Negative)
+                }
             },
             dismissButton = {
-                TextButton(onClick = { viewModel.onDeleteConfirmRequest(false) }) { Text("Cancel") }
+                TextButton(onClick = { viewModel.onDeleteConfirmRequest(false) }) {
+                    Text(stringResource(R.string.history_cancel))
+                }
             },
         )
     }
@@ -131,11 +152,23 @@ fun HistoryDetailScreen(
 @Composable
 private fun HeaderCard(session: TrainingSession) {
     WarriorCard {
-        Text(DateFormats.dayHeader(session.date), style = MaterialTheme.typography.titleLarge)
+        Text(
+            DateFormats.dayHeader(
+                session.date,
+                todayLabel = stringResource(R.string.history_day_today),
+                yesterdayLabel = stringResource(R.string.history_day_yesterday),
+            ),
+            style = MaterialTheme.typography.titleLarge,
+        )
         Spacer(Modifier.height(6.dp))
         Text(
-            "${DateFormats.durationLabel(session.totalDuration.inWholeMinutes)} · ${session.totalRounds} rounds · " +
-                "int ${session.overallIntensity}/10 · felt ${session.overallFeeling.name.lowercase()}",
+            stringResource(
+                R.string.history_detail_header_meta,
+                DateFormats.durationLabel(session.totalDuration.inWholeMinutes),
+                pluralStringResource(R.plurals.history_rounds_count, session.totalRounds, session.totalRounds),
+                session.overallIntensity,
+                session.overallFeeling.label,
+            ),
             style = MaterialTheme.typography.bodyMedium,
             color = TextMuted,
         )

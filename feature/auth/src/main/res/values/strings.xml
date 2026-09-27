@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auth_wordmark">WARRIOR</string>
+    <string name="auth_tagline">LOG · TRACK · ANALYZE · IMPROVE</string>
+    <string name="auth_field_display_name">Display name</string>
+    <string name="auth_field_username">Username</string>
+    <string name="auth_field_password">Password</string>
+    <string name="auth_action_login">Log In</string>
+    <string name="auth_action_register">Create Account</string>
+    <string name="auth_action_back_to_login">Back to Login</string>
+    <string name="auth_local_only_note">Local-only account — your data never leaves this device.</string>
+
+    <!-- Error copy keyed by AuthErrorCode (i18n-ready, Phase 9) -->
+    <string name="auth_error_username_format">Username must be 3–30 characters: a–z, 0–9 or underscore</string>
+    <string name="auth_error_display_name_invalid">Display name must be 1–50 characters</string>
+    <string name="auth_error_password_too_short">Password must be at least 8 characters</string>
+    <string name="auth_error_username_blank">Username must not be blank</string>
+    <string name="auth_error_password_empty">Password must not be empty</string>
+    <string name="auth_error_duplicate_username">Username already taken on this device</string>
+    <string name="auth_error_invalid_credentials">Invalid username or password</string>
+    <string name="auth_error_unexpected">Unexpected error — please try again</string>
+</resources>

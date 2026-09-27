@@ -20,13 +20,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.warrior.core.common.time.DateFormats
 import com.warrior.core.designsystem.components.WarriorBadge
-import com.warrior.core.designsystem.components.WarriorButton
 import com.warrior.core.designsystem.components.WarriorCard
+import com.warrior.core.designsystem.components.WarriorEmptyState
 import com.warrior.core.designsystem.components.WarriorTopBar
 import com.warrior.core.designsystem.theme.Cardio
 import com.warrior.core.designsystem.theme.HeavyBag
@@ -36,6 +37,7 @@ import com.warrior.core.designsystem.theme.TextMuted
 import com.warrior.domain.training.model.TrainingSession
 import com.warrior.domain.training.model.WorkoutType
 import com.warrior.domain.training.model.label
+import com.warrior.domain.training.model.rowTitle
 
 @Composable
 fun HistoryScreen(
@@ -47,25 +49,26 @@ fun HistoryScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     Column(modifier.fillMaxSize().padding(horizontal = 18.dp)) {
-        WarriorTopBar(title = "History")
+        WarriorTopBar(title = stringResource(R.string.history_title))
         if (state.loaded && state.groups.isEmpty()) {
             WarriorCard {
-                Text("No sessions yet", style = MaterialTheme.typography.titleMedium)
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    "Logged workouts group here by day, using Saturday → Friday weeks.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = TextMuted,
+                WarriorEmptyState(
+                    title = stringResource(R.string.history_empty_title),
+                    body = stringResource(R.string.history_empty_body),
+                    actionLabel = stringResource(R.string.history_cta_log),
+                    onAction = onStartWorkout,
                 )
-                Spacer(Modifier.height(12.dp))
-                WarriorButton(text = "+ Log Workout", onClick = onStartWorkout)
             }
         } else {
             LazyColumn {
                 state.groups.forEach { group ->
                     item(key = "header-${group.key}") {
                         Text(
-                            group.label.uppercase(),
+                            DateFormats.dayHeader(
+                                group.key,
+                                todayLabel = stringResource(R.string.history_day_today),
+                                yesterdayLabel = stringResource(R.string.history_day_yesterday),
+                            ).uppercase(),
                             style = MaterialTheme.typography.labelSmall,
                             color = TextMuted,
                             modifier = Modifier.padding(top = 14.dp, bottom = 6.dp, start = 2.dp),
@@ -107,31 +110,23 @@ private fun SessionRow(session: TrainingSession, showDivider: Boolean, onClick: 
             )
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
-                Text(rowTitle(session), style = MaterialTheme.typography.titleMedium)
+                Text(session.rowTitle, style = MaterialTheme.typography.titleMedium)
                 Text(
-                    "${DateFormats.short(session.date)} · " +
-                        DateFormats.durationLabel(session.totalDuration.inWholeMinutes) +
-                        " · felt ${session.overallFeeling.name.lowercase()}",
+                    stringResource(
+                        R.string.history_session_meta,
+                        DateFormats.short(session.date),
+                        DateFormats.durationLabel(session.totalDuration.inWholeMinutes),
+                        session.overallFeeling.label,
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = TextMuted,
                 )
             }
-            WarriorBadge(text = "INT ${session.overallIntensity}", highlight = true)
+            WarriorBadge(text = stringResource(R.string.history_intensity_badge, session.overallIntensity), highlight = true)
         }
         if (showDivider) {
             androidx.compose.material3.HorizontalDivider(color = com.warrior.core.designsystem.theme.Outline)
         }
-    }
-}
-
-private fun rowTitle(session: TrainingSession): String {
-    val first = session.activities.firstOrNull() ?: return "Session"
-    val rounds = session.totalRounds
-    val extra = session.activities.size - 1
-    return buildString {
-        append(first.type.label)
-        if (rounds > 0) append(" · $rounds rounds")
-        if (extra > 0) append(" +$extra more")
     }
 }
 

@@ -1,5 +1,10 @@
 package com.warrior.app.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -10,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -20,6 +26,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.warrior.app.AppViewModel
+import com.warrior.app.BuildConfig
+import com.warrior.app.R
 import com.warrior.core.designsystem.icons.WarriorIconHistory
 import com.warrior.core.designsystem.icons.WarriorIconHome
 import com.warrior.core.designsystem.icons.WarriorIconProfile
@@ -71,29 +79,29 @@ private fun MainScreen() {
                     NavigationBarItem(
                         selected = currentRoute == "HomeRoute",
                         onClick = { navController.navigateTab(HomeRoute) },
-                        icon = { Icon(WarriorIconHome, contentDescription = "Home") },
-                        label = { Text("Home") },
+                        icon = { Icon(WarriorIconHome, contentDescription = stringResource(R.string.nav_home)) },
+                        label = { Text(stringResource(R.string.nav_home)) },
                         colors = warriorNavItemColors(),
                     )
                     NavigationBarItem(
                         selected = currentRoute == "HistoryRoute",
                         onClick = { navController.navigateTab(HistoryRoute) },
-                        icon = { Icon(WarriorIconHistory, contentDescription = "History") },
-                        label = { Text("History") },
+                        icon = { Icon(WarriorIconHistory, contentDescription = stringResource(R.string.nav_history)) },
+                        label = { Text(stringResource(R.string.nav_history)) },
                         colors = warriorNavItemColors(),
                     )
                     NavigationBarItem(
                         selected = currentRoute == "ProgressRoute",
                         onClick = { navController.navigateTab(ProgressRoute) },
-                        icon = { Icon(WarriorIconProgress, contentDescription = "Progress") },
-                        label = { Text("Progress") },
+                        icon = { Icon(WarriorIconProgress, contentDescription = stringResource(R.string.nav_progress)) },
+                        label = { Text(stringResource(R.string.nav_progress)) },
                         colors = warriorNavItemColors(),
                     )
                     NavigationBarItem(
                         selected = currentRoute == "ProfileRoute",
                         onClick = { navController.navigateTab(ProfileRoute) },
-                        icon = { Icon(WarriorIconProfile, contentDescription = "Profile") },
-                        label = { Text("Profile") },
+                        icon = { Icon(WarriorIconProfile, contentDescription = stringResource(R.string.nav_profile)) },
+                        label = { Text(stringResource(R.string.nav_profile)) },
                         colors = warriorNavItemColors(),
                     )
                 }
@@ -104,6 +112,15 @@ private fun MainScreen() {
             navController = navController,
             startDestination = HomeRoute,
             modifier = Modifier.padding(padding),
+            // Phase 9 polish: uniform, subtle transitions for every destination.
+            enterTransition = {
+                fadeIn(tween(220)) + slideInHorizontally(tween(220)) { it / 12 }
+            },
+            exitTransition = { fadeOut(tween(180)) },
+            popEnterTransition = { fadeIn(tween(220)) },
+            popExitTransition = {
+                fadeOut(tween(180)) + slideOutHorizontally(tween(180)) { it / 12 }
+            },
         ) {
             composable<HomeRoute> {
                 HomeScreen(
@@ -125,7 +142,7 @@ private fun MainScreen() {
                 )
             }
             composable<ProgressRoute> { ProgressScreen() }
-            composable<ProfileRoute> { ProfileScreen() }
+            composable<ProfileRoute> { ProfileScreen(version = BuildConfig.VERSION_NAME) }
             composable<WorkoutRoute> { entry ->
                 val route = entry.toRoute<WorkoutRoute>()
                 WorkoutLoggingScreen(

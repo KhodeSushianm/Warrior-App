@@ -109,7 +109,7 @@ class WorkoutLoggingViewModelTest {
         val vm = newViewModel()
         vm.onSave()
         assertFalse(vm.state.value.isSaved)
-        assertTrue(vm.state.value.errors.any { it.contains("at least one activity") })
+        assertTrue(vm.state.value.errorCodes.contains(com.warrior.domain.training.validation.TrainingErrorCode.NO_ACTIVITIES))
         assertTrue(repository.observeSessions(7).first().isEmpty())
     }
 

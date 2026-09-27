@@ -6,7 +6,9 @@ import com.warrior.domain.training.model.Round
 import com.warrior.domain.training.model.TrainingSession
 import com.warrior.domain.training.model.WorkoutActivity
 import com.warrior.domain.training.model.WorkoutType
+import com.warrior.domain.training.validation.TrainingErrorCode
 import com.warrior.domain.training.validation.TrainingValidation
+import com.warrior.domain.training.validation.ValidationException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -80,5 +82,16 @@ class TrainingValidationTest {
         assertTrue(TrainingValidation.validate(badIntensity).any { it.contains("intensity") })
 
         assertTrue(TrainingValidation.validate(session(activities = listOf(activity(rounds = listOf(round(1, rest = 0)))))).isEmpty())
+    }
+
+    @Test
+    fun requireValid_throwsWithMatchingCodes() {
+        val bad = session(intensity = 0, activities = emptyList())
+        val error = runCatching { TrainingValidation.requireValid(bad) }.exceptionOrNull()
+        assertTrue(error is ValidationException)
+        val codes = (error as ValidationException).codes
+        assertTrue(codes.contains(TrainingErrorCode.OVERALL_INTENSITY_RANGE))
+        assertTrue(codes.contains(TrainingErrorCode.NO_ACTIVITIES))
+        assertEquals(codes.size, error.messages.size)
     }
 }

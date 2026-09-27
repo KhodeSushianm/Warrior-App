@@ -52,3 +52,17 @@ class ObserveSession @Inject constructor(private val session: LocalSession) {
 class GetAccount @Inject constructor(private val repository: AuthRepository) {
     suspend operator fun invoke(userId: Long): LocalAccount? = repository.getAccount(userId)
 }
+
+/**
+ * Edits the profile identity (Phase 9): validates like registration's
+ * identity rules, normalizes the username, and enforces on-device uniqueness
+ * through the repository. Password is never part of this flow.
+ */
+class UpdateAccount @Inject constructor(private val repository: AuthRepository) {
+    suspend operator fun invoke(userId: Long, displayName: String, username: String): Result<Unit> =
+        runCatching {
+            val normalized = username.trim().lowercase()
+            AuthValidation.requireProfile(normalized, displayName.trim())
+            repository.updateAccount(userId, displayName.trim(), normalized)
+        }
+}

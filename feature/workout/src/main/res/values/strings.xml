@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="workout_title_new">New Session</string>
+    <string name="workout_title_edit">Edit Session</string>
+    <string name="workout_step_activities">Activities</string>
+    <string name="workout_step_review">Review &amp; Save</string>
+    <string name="workout_badge_edit">EDIT</string>
+
+    <string name="workout_label_date">DATE</string>
+    <string name="workout_value_today">Today</string>
+    <string name="workout_overall_intensity">Overall intensity — %1$d/10</string>
+    <string name="workout_label_feeling">FEELING</string>
+    <string name="workout_field_notes">Notes</string>
+
+    <string name="workout_action_continue">Continue →</string>
+    <string name="workout_action_add_activity">+ Add Activity</string>
+    <string name="workout_action_save">Save Session</string>
+    <string name="workout_action_saving">Saving…</string>
+    <string name="workout_action_delete_session">Delete Session</string>
+
+    <string name="workout_delete_title">Delete this session?</string>
+    <string name="workout_delete_body">Activities and rounds are deleted with it. This cannot be undone.</string>
+    <string name="workout_delete_confirm">Delete</string>
+    <string name="workout_cancel">Cancel</string>
+
+    <string name="workout_empty_activities_title">No activities yet</string>
+    <string name="workout_empty_activities_body">Add heavy bag, mitt work, sparring or cardio blocks.</string>
+    <string name="workout_label_duration">Duration</string>
+    <string name="workout_stepper_minutes">%1$d min</string>
+    <string name="workout_activity_intensity">Intensity — %1$d/10</string>
+    <string name="workout_label_focus">FOCUS</string>
+    <string name="workout_rounds_count">Rounds — %1$d</string>
+    <string name="workout_add_round">+ round</string>
+    <string name="workout_round_label">R%1$d</string>
+    <string name="workout_round_work">%1$dm work</string>
+    <string name="workout_round_rest">%1$dm rest</string>
+    <string name="workout_remove_round_cd">Remove round</string>
+    <string name="workout_remove_activity">✕ remove activity</string>
+
+    <string name="workout_review_date">Date</string>
+    <string name="workout_review_activities">Activities</string>
+    <string name="workout_review_total_duration">Total duration</string>
+    <string name="workout_review_rounds">Rounds</string>
+    <string name="workout_review_intensity">Overall intensity</string>
+    <string name="workout_review_feeling">Feeling</string>
+    <string name="workout_review_intensity_value">%1$d/10</string>
+    <string name="workout_activity_title_with_rounds">%1$s · %2$d rounds</string>
+    <string name="workout_review_activity_meta">%1$s · %2$dm · int %3$d</string>
+
+    <!-- Error copy keyed by TrainingErrorCode (i18n-ready, Phase 9) -->
+    <string name="workout_error_overall_intensity_range">Overall intensity must be between 1 and 10</string>
+    <string name="workout_error_no_activities">Add at least one activity to save the session</string>
+    <string name="workout_error_activity_duration">Every activity needs a duration above zero</string>
+    <string name="workout_error_activity_intensity">Activity intensity must be between 1 and 10</string>
+    <string name="workout_error_round_number">Round numbers must be positive</string>
+    <string name="workout_error_round_duration">Round work time must be above zero</string>
+    <string name="workout_error_round_rest">Round rest cannot be negative</string>
+    <string name="workout_error_round_intensity">Round intensity must be between 1 and 10</string>
+    <string name="workout_error_session_not_found">This session no longer exists</string>
+    <string name="workout_error_not_signed_in">You are signed out — please log in again</string>
+    <string name="workout_error_save_failed">Could not save the session — please try again</string>
+    <string name="workout_error_unexpected">Unexpected error — please try again</string>
+</resources>

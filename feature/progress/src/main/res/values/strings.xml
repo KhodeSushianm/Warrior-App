@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="progress_title">Progress</string>
+    <string name="progress_compare_header">%1$s  vs  PREVIOUS WEEK</string>
+    <string name="progress_row_sessions">Sessions</string>
+    <string name="progress_row_training_time">Training time</string>
+    <string name="progress_row_rounds">Rounds</string>
+    <string name="progress_row_avg_intensity">Avg intensity</string>
+    <string name="progress_row_training_days">Training days</string>
+    <string name="progress_delta_unit_minutes">m</string>
+
+    <string name="progress_empty_title">No training data yet</string>
+    <string name="progress_empty_body">Log workouts and your volume trends and distributions will appear here.</string>
+
+    <string name="progress_volume_title">TRAINING VOLUME · LAST %1$d WEEKS</string>
+    <string name="progress_volume_now">NOW</string>
+    <string name="progress_volume_week_offset">W-%1$d</string>
+
+    <string name="progress_workout_distribution_title">WORKOUT DISTRIBUTION</string>
+    <string name="progress_focus_distribution_title">FOCUS DISTRIBUTION</string>
+    <string name="progress_distribution_empty">No activities recorded yet.</string>
+    <string name="progress_percent_value">%1$d%%</string>
+</resources>

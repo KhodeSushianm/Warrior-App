@@ -13,10 +13,13 @@ class DateFormatsTest {
     fun dayHeader_handlesTodayYesterdayAndFullDate() {
         val now = 1_758_800_000_000L // fixed "now"
         val today = TimeUtils.localDayMidnightUtcMillis(now, utc)
-        assertEquals("Today", DateFormats.dayHeader(today, now, utc))
-        assertEquals("Yesterday", DateFormats.dayHeader(today - dayMs, now, utc))
+        assertEquals("Today", DateFormats.dayHeader(today, now, utc, todayLabel = "Today", yesterdayLabel = "Yesterday"))
+        assertEquals(
+            "Yesterday",
+            DateFormats.dayHeader(today - dayMs, now, utc, todayLabel = "Today", yesterdayLabel = "Yesterday"),
+        )
         // older day renders a full Gregorian label with weekday
-        val label = DateFormats.dayHeader(today - 5 * dayMs, now, utc)
+        val label = DateFormats.dayHeader(today - 5 * dayMs, now, utc, todayLabel = "Today", yesterdayLabel = "Yesterday")
         assert(label.matches(Regex("[A-Z][a-z]{2}, [A-Z][a-z]{2} \\d{1,2}, \\d{4}"))) { label }
     }
 

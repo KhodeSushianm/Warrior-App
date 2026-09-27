@@ -51,4 +51,18 @@ class RoomAuthRepository @Inject constructor(
 
     override suspend fun getAccount(userId: Long): LocalAccount? =
         userDao.getById(userId)?.let { LocalAccount(id = it.id, username = it.username, displayName = it.displayName) }
+
+    override suspend fun updateAccount(userId: Long, displayName: String, username: String) {
+        val normalized = username.trim().lowercase()
+        userDao.getByUsername(normalized)?.let { clash ->
+            if (clash.id != userId) throw DuplicateUsernameException(normalized)
+        }
+        userDao.getById(userId) ?: throw NoSuchElementException("user $userId not found")
+        userDao.updateProfile(
+            id = userId,
+            displayName = displayName,
+            username = normalized,
+            updatedAt = System.currentTimeMillis(),
+        )
+    }
 }
