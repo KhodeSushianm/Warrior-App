@@ -19,7 +19,8 @@
 | فاز ۶ — History (لیست روزانه + جزئیات زنده) | ✅ کامل — [گزارش فاز](docs/phase-reports/06-history.md) |
 | فاز ۷ — Progress Engine + Home Dashboard (هفتهٔ شنبه→جمعه، Streak، PRها) | ✅ کامل — [گزارش فاز](docs/phase-reports/07-progress-dashboard.md) |
 | فاز ۸ — Charts + Progress Screen (نمودارهای Canvas سفارشی، heatmap، مقایسهٔ هفته‌ها) | ✅ کامل — [گزارش فاز](docs/phase-reports/08-charts-progress.md) |
-| فاز ۹ و ۱۰ | ⏸ منتظر تایید مالک برای شروع فاز ۹ |
+| فاز ۹ — Profile + UI Polish (ویرایش پروفایل، منابع رشتهٔ i18n-ready، حالت‌ها و ترنزیشن‌های یکدست) | ✅ کامل — [گزارش فاز](docs/phase-reports/09-profile-polish.md) |
+| فاز ۱۰ — Hardening + Release RC | ⏸ منتظر تایید مالک برای شروع فاز ۱۰ |
 
 ## بیلد
 
