@@ -21,7 +21,7 @@ import java.util.TimeZone
  * existing instant of that local day. Accepted for MVP.
  */
 class WeekBoundaryProvider(
-    private val zone: TimeZone = TimeZone.getDefault(),
+    val zone: TimeZone = TimeZone.getDefault(),
 ) {
 
     /** Local midnight (UTC epoch millis) of the week-start day containing [nowMillis]. */

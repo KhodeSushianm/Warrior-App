@@ -51,4 +51,49 @@ data class HomeProgress(
     val streakWeeks: Int,
     val records: PersonalRecords,
     val recentSessions: List<TrainingSession>,
+    val heatmap: TrainingHeatmap = TrainingHeatmap(emptyList()),
 )
+
+/** One training-volume bar (Phase 8): a whole week reduced to chart inputs. */
+data class WeeklyVolume(
+    val weekStart: Long,
+    val trainingMinutes: Long = 0,
+    val sessionCount: Int = 0,
+    val trainingDays: Int = 0,
+)
+
+/** One slice of the all-time focus distribution (Phase 8). */
+data class FocusSlice(
+    val focus: FocusArea,
+    val minutes: Long,
+)
+
+/**
+ * Everything the Progress screen derives (Phase 8): week-over-week comparison,
+ * an 8-week volume series (oldest first, last entry = current week) and
+ * all-time distributions — matching the approved ui-preview reference.
+ */
+data class ProgressSnapshot(
+    val thisWeek: WeeklyMetrics,
+    val lastWeek: WeeklyMetrics,
+    val volumeSeries: List<WeeklyVolume>,
+    val workoutDistribution: Map<WorkoutType, Long>,
+    val topFocusAreas: List<FocusSlice>,
+)
+
+/**
+ * One calendar-month block of the Home training-days heatmap. Grid columns run
+ * Saturday→Friday (same central rule as §13.2) — [firstDayColumnOffset] is the
+ * number of leading blank cells before day 1.
+ */
+data class MonthHeatmap(
+    val year: Int,
+    val month: Int,
+    val firstDayColumnOffset: Int,
+    val daysInMonth: Int,
+    val trainedDays: Set<Int> = emptySet(),
+    val todayDay: Int? = null,
+)
+
+/** The last N calendar months (oldest first, last = current month). */
+data class TrainingHeatmap(val months: List<MonthHeatmap>)

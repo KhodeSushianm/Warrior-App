@@ -28,6 +28,14 @@ class DateFormatsTest {
     }
 
     @Test
+    fun monthLabel_shortEnglishMonthNames() {
+        assertEquals("Jul", DateFormats.monthLabel(2026, 7))
+        assertEquals("Sep", DateFormats.monthLabel(2026, 9))
+        assertEquals("Dec", DateFormats.monthLabel(2026, 12))
+        assertEquals("Feb", DateFormats.monthLabel(2028, 2))
+    }
+
+    @Test
     fun weekRange_formatsFirstAndLastLocalDay() {
         // Plain UTC week: Sat Sep 19 .. next Sat Sep 26 (exclusive).
         assertEquals(

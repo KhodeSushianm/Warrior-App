@@ -1,6 +1,7 @@
 package com.warrior.core.common.time
 
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -43,6 +44,17 @@ object DateFormats {
     /** 165 -> "2h 45m"; 45 -> "45m". */
     fun durationLabel(totalMinutes: Long): String =
         if (totalMinutes >= 60) "${totalMinutes / 60}h ${totalMinutes % 60}m" else "${totalMinutes}m"
+
+    /** "Sep" — heatmap month labels. [month] is 1-based, timezone-independent. */
+    fun monthLabel(year: Int, month: Int): String {
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+            clear()
+            set(year, month - 1, 1)
+        }
+        val formatter = SimpleDateFormat("MMM", Locale.ENGLISH)
+        formatter.timeZone = TimeZone.getTimeZone("UTC")
+        return formatter.format(Date(calendar.timeInMillis))
+    }
 
     /**
      * "Sep 19 – Sep 25" for week headers (THIS WEEK card). [endExclusiveMillis]

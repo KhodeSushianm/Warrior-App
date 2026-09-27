@@ -32,6 +32,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.warrior.core.common.time.DateFormats
 import com.warrior.core.designsystem.components.DeltaText
+import com.warrior.core.designsystem.components.HeatmapMonth
+import com.warrior.core.designsystem.components.TrainingHeatmapGrid
 import com.warrior.core.designsystem.components.WarriorButton
 import com.warrior.core.designsystem.components.WarriorCard
 import com.warrior.core.designsystem.components.WarriorTopBar
@@ -108,6 +110,23 @@ private fun HomeContent(
     onOpenSession: (Long) -> Unit,
 ) {
     ThisWeekCard(progress, weekRangeLabel)
+
+    Spacer(Modifier.height(16.dp))
+    SectionHeader("TRAINING DAYS · LAST 3 MONTHS")
+    Spacer(Modifier.height(8.dp))
+    WarriorCard {
+        TrainingHeatmapGrid(
+            months = progress.heatmap.months.map { month ->
+                HeatmapMonth(
+                    label = DateFormats.monthLabel(month.year, month.month),
+                    leadingBlanks = month.firstDayColumnOffset,
+                    daysInMonth = month.daysInMonth,
+                    trainedDays = month.trainedDays,
+                    todayDay = month.todayDay,
+                )
+            },
+        )
+    }
 
     Spacer(Modifier.height(16.dp))
     SectionHeader("RECENT SESSIONS")
