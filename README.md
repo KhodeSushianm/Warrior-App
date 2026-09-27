@@ -20,13 +20,16 @@
 | فاز ۷ — Progress Engine + Home Dashboard (هفتهٔ شنبه→جمعه، Streak، PRها) | ✅ کامل — [گزارش فاز](docs/phase-reports/07-progress-dashboard.md) |
 | فاز ۸ — Charts + Progress Screen (نمودارهای Canvas سفارشی، heatmap، مقایسهٔ هفته‌ها) | ✅ کامل — [گزارش فاز](docs/phase-reports/08-charts-progress.md) |
 | فاز ۹ — Profile + UI Polish (ویرایش پروفایل، منابع رشتهٔ i18n-ready، حالت‌ها و ترنزیشن‌های یکدست) | ✅ کامل — [گزارش فاز](docs/phase-reports/09-profile-polish.md) |
-| فاز ۱۰ — Hardening + Release RC | ⏸ منتظر تایید مالک برای شروع فاز ۱۰ |
+| فاز ۱۰ — Hardening + Release RC (R8، قانون ۱۱، MigrationTestHelper، APK امضاشده) | ✅ کامل — [گزارش فاز](docs/phase-reports/10-hardening-release.md) |
+
+**MVP کامل شد.** نسخهٔ ۱.۰.۰ (RC1) از بخش [Releases](https://github.com/KhodeSushianm/Warrior-App/releases) قابل دانلود است.
 
 ## بیلد
 
 ```bash
 scripts/setup-toolchain.sh   # JDK 17 + Gradle + Android SDK (idempotent)
 scripts/build-debug.sh       # app-debug.apk
+scripts/build-release.sh     # app-release.apk (R8 + امضای RC — الگوی کم‌حافظه، مستند در گزارش فاز ۱۰)
 ```
 
 > نکته: در محیط‌های با RAM ≤ 1GB، `build-debug.sh`.merge سنگین dex خارجی را با D8 مستقل انجام می‌دهد (مستند در گزارش فاز ۱).
@@ -74,9 +77,9 @@ Foundation ← Database ← Authentication ← Workout Logging ← History
 
 ## اجرای پروژه
 
-فازهای ۱ و ۲ کامل شده‌اند؛ اسکیمای Room نسخهٔ ۱ Freeze شده است
+همهٔ فازهای MVP (۱ تا ۱۰) کامل شده‌اند؛ اسکیمای Room نسخهٔ ۱ Freeze شده است
 (`data/local/schemas/com.warrior.data.local.database.WarriorDatabase/1.json`).
-کد فازهای بعد مطابق `EXECUTION-PLAN.md` اضافه می‌شود.
+نسخهٔ نهایی مطابق `EXECUTION-PLAN.md` ساخته و در Releases منتشر شده است.
 
 ## مجوز
 

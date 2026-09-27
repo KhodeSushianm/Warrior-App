@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -16,18 +18,36 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0-mvp"
+        versionName = "1.0.0"
+    }
+
+    signingConfigs {
+        // RC signing (Phase 10): self-signed key committed for reproducible
+        // sideload builds — see keystore.properties for the security note.
+        create("release") {
+            val keystoreProperties = Properties().apply {
+                val file = rootProject.file("keystore.properties")
+                if (file.exists()) file.inputStream().use { load(it) }
+            }
+            storeFile = rootProject.file(keystoreProperties.getProperty("storeFile", "keystore/warrior-release.jks"))
+            storePassword = keystoreProperties.getProperty("storePassword")
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
+        }
     }
 
     buildTypes {
-        debug {
-            // Architecture Rule 11: destructive migration only in Debug, behind a flag.
-            buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
-        }
+        // Architecture Rule 11 (Phase 10): the ALLOW_DESTRUCTIVE_MIGRATION flag
+        // lives in :data:local's own BuildConfig — debug-only there; release
+        // builds fail loudly on a missing migration instead of wiping data.
         release {
-            isMinifyEnabled = false
-            buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "false")
+            isMinifyEnabled = true
+            // Resource shrinking needs AGP's internal R8 -printresources wiring,
+            // which the standalone-R8 low-RAM flow (scripts/build-release.sh)
+            // cannot reproduce; code shrinking + obfuscation stay ON.
+            isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 

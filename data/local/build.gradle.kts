@@ -14,6 +14,20 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
+    buildFeatures { buildConfig = true }
+    buildTypes {
+        debug {
+            // Architecture Rule 11: destructive fallback is Debug-only, behind a flag.
+            buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "true")
+        }
+        release {
+            buildConfigField("boolean", "ALLOW_DESTRUCTIVE_MIGRATION", "false")
+        }
+    }
+    sourceSets {
+        // Frozen schema JSONs double as test assets for MigrationTestHelper (Phase 10).
+        getByName("test").assets.srcDir("$projectDir/schemas")
+    }
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
@@ -46,6 +60,7 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
+    testImplementation(libs.room.testing)
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.kotlinx.coroutines.test)
 }

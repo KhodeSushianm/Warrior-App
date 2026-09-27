@@ -2,6 +2,7 @@ package com.warrior.data.local.di
 
 import android.content.Context
 import androidx.room.Room
+import com.warrior.data.local.BuildConfig
 import com.warrior.data.local.dao.RoundDao
 import com.warrior.data.local.dao.TrainingSessionDao
 import com.warrior.data.local.dao.UserDao
@@ -22,8 +23,14 @@ object DatabaseModule {
     @Singleton
     fun provideWarriorDatabase(@ApplicationContext context: Context): WarriorDatabase =
         Room.databaseBuilder(context, WarriorDatabase::class.java, WarriorDatabase.NAME)
-            // Architecture Rule 11: destructive fallback is Debug-only, behind a
-            // BuildConfig flag, and is wired in Phase 10 (release hardening).
+            // Architecture Rule 11 (wired in Phase 10): destructive fallback only
+            // in Debug behind the module's BuildConfig flag — release builds fail
+            // loudly on a missing migration instead of destroying user data.
+            .apply {
+                if (BuildConfig.ALLOW_DESTRUCTIVE_MIGRATION) {
+                    fallbackToDestructiveMigration()
+                }
+            }
             .build()
 
     @Provides
