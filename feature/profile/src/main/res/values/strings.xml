@@ -3,11 +3,12 @@
     <string name="profile_title">Profile</string>
     <string name="profile_local_account">@%1$s · local account</string>
 
+    <string name="profile_row_body">Athlete body</string>
     <string name="profile_row_edit">Edit profile</string>
     <string name="profile_row_export">Export backup</string>
-    <string name="profile_badge_post_mvp">Post-MVP</string>
-    <string name="profile_row_about">About · v%1$s</string>
+    <string name="profile_row_import">Import backup</string>
     <string name="profile_badge_offline">offline</string>
+    <string name="profile_row_about">About · v%1$s</string>
 
     <string name="profile_privacy_body">All training data is stored only on this device (Room/SQLite). Password is stored as a PBKDF2 hash with a per-user salt — never in plain text.</string>
     <string name="profile_logout">Log Out</string>
@@ -17,14 +18,67 @@
     <string name="profile_field_username">Username</string>
     <string name="profile_action_save">Save</string>
     <string name="profile_action_cancel">Cancel</string>
+    <string name="profile_action_ok">OK</string>
 
     <string name="profile_about_title">About WARRIOR</string>
     <string name="profile_about_body">WARRIOR is a local-first training log for boxers: log sessions, track your history and analyze progress — fully offline. Your data never leaves this device.</string>
     <string name="profile_about_version">Version %1$s</string>
+
+    <!-- Backup (Season 2 / Phase 12) -->
+    <string name="profile_export_success_title">Backup exported</string>
+    <string name="profile_export_success_body">Your WARRIOR backup file has been saved. Keep it somewhere safe — it restores everything, accounts included.</string>
+    <string name="profile_export_failed_title">Export failed</string>
+    <string name="profile_export_failed_body">The backup file could not be written. Please try again.</string>
+    <string name="profile_import_confirm_title">Import backup?</string>
+    <string name="profile_import_confirm_body">This REPLACES all data on this device with the backup\u0027s contents — including accounts. You will be signed out afterwards.</string>
+    <string name="profile_import_confirm_action">Replace &amp; import</string>
+    <string name="profile_import_success_title">Backup restored</string>
+    <string name="profile_import_success_body">%1$d training sessions restored. Log in with one of the restored accounts to continue.</string>
+    <string name="profile_import_invalid_title">Not a WARRIOR backup</string>
+    <string name="profile_import_invalid_body">This file is not a valid WARRIOR backup (or its format version is unsupported). Nothing was changed.</string>
+    <string name="profile_import_failed_title">Import failed</string>
+    <string name="profile_import_failed_body">The restore did not complete. Your existing data was not changed.</string>
 
     <!-- Error copy keyed by AuthErrorCode (i18n-ready, Phase 9) -->
     <string name="profile_error_username_format">Username must be 3–30 characters: a–z, 0–9 or underscore</string>
     <string name="profile_error_display_name_invalid">Display name must be 1–50 characters</string>
     <string name="profile_error_duplicate_username">Username already taken on this device</string>
     <string name="profile_error_unexpected">Could not save the profile — please try again</string>
+
+    <!-- Athlete body (Season 2 / Phase 12) -->
+    <string name="body_title">Athlete Body</string>
+    <string name="body_add">+ Add measurement</string>
+    <string name="body_empty_title">No measurements yet</string>
+    <string name="body_empty_body">Track your weight, reach and body fat to see trends before a camp or a fight.</string>
+    <string name="body_latest_weight">CURRENT WEIGHT</string>
+    <string name="body_unit_kg">kg</string>
+    <string name="body_day_today">Today</string>
+    <string name="body_day_yesterday">Yesterday</string>
+    <string name="body_trend_title">WEIGHT TREND</string>
+    <string name="body_measurements_title">MEASUREMENTS</string>
+    <string name="body_height">Height</string>
+    <string name="body_reach">Reach</string>
+    <string name="body_bodyfat">Body fat</string>
+    <string name="body_hr">Resting HR</string>
+    <string name="body_history_title">HISTORY</string>
+    <string name="body_dialog_title">New measurement</string>
+    <string name="body_field_weight">Weight (kg) *</string>
+    <string name="body_field_height">Height (cm)</string>
+    <string name="body_field_reach">Reach (cm)</string>
+    <string name="body_field_bodyfat">Body fat (%)</string>
+    <string name="body_field_hr">Resting heart rate (bpm)</string>
+    <string name="body_save">Save</string>
+    <string name="body_cancel">Cancel</string>
+    <string name="body_delete_title">Delete measurement?</string>
+    <string name="body_delete_body">This removes the checkpoint from your history.</string>
+    <string name="body_delete_confirm">Delete</string>
+
+    <!-- Error copy keyed by BodyErrorCode -->
+    <string name="body_error_weight">Weight must be between 20 and 400 kg</string>
+    <string name="body_error_height">Height must be between 100 and 250 cm</string>
+    <string name="body_error_reach">Reach must be between 100 and 250 cm</string>
+    <string name="body_error_bodyfat">Body fat must be between 3 and 70%</string>
+    <string name="body_error_hr">Resting heart rate must be between 30 and 220 bpm</string>
+    <string name="body_error_date">The date is invalid</string>
+    <string name="body_error_unexpected">Could not save the measurement — please try again</string>
 </resources>

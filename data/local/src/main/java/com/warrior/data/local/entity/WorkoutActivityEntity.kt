@@ -6,11 +6,13 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.warrior.domain.training.model.FocusArea
 import com.warrior.domain.training.model.WorkoutType
+import kotlinx.serialization.Serializable
 
 /**
  * One workout activity inside a session. See Database Design v4 §3.
  * `duration` is milliseconds and must be > 0.
  */
+@Serializable
 @Entity(
     tableName = "workout_activities",
     foreignKeys = [

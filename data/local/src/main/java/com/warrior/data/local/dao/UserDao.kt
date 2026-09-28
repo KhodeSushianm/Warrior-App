@@ -49,4 +49,11 @@ interface UserDao {
 
     @Delete
     suspend fun delete(user: UserEntity)
+
+    /** Full-table read for backup export (Season 2 / Phase 12). */
+    @Query("SELECT * FROM users")
+    suspend fun getAllForExport(): List<UserEntity>
+
+    @Query("DELETE FROM users")
+    suspend fun deleteAll(): Int
 }

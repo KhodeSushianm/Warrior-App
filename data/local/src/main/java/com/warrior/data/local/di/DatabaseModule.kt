@@ -3,10 +3,13 @@ package com.warrior.data.local.di
 import android.content.Context
 import androidx.room.Room
 import com.warrior.data.local.BuildConfig
+import com.warrior.data.local.dao.BodyMetricDao
 import com.warrior.data.local.dao.RoundDao
+import com.warrior.data.local.dao.SessionTagDao
 import com.warrior.data.local.dao.TrainingSessionDao
 import com.warrior.data.local.dao.UserDao
 import com.warrior.data.local.dao.WorkoutActivityDao
+import com.warrior.data.local.database.MIGRATION_1_2
 import com.warrior.data.local.database.WarriorDatabase
 import dagger.Module
 import dagger.Provides
@@ -26,6 +29,7 @@ object DatabaseModule {
             // Architecture Rule 11 (wired in Phase 10): destructive fallback only
             // in Debug behind the module's BuildConfig flag — release builds fail
             // loudly on a missing migration instead of destroying user data.
+            .addMigrations(MIGRATION_1_2)
             .apply {
                 if (BuildConfig.ALLOW_DESTRUCTIVE_MIGRATION) {
                     fallbackToDestructiveMigration()
@@ -44,4 +48,10 @@ object DatabaseModule {
 
     @Provides
     fun provideRoundDao(db: WarriorDatabase): RoundDao = db.roundDao()
+
+    @Provides
+    fun provideBodyMetricDao(db: WarriorDatabase): BodyMetricDao = db.bodyMetricDao()
+
+    @Provides
+    fun provideSessionTagDao(db: WarriorDatabase): SessionTagDao = db.sessionTagDao()
 }

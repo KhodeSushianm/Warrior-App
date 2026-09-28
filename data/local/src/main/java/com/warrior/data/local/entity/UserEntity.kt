@@ -3,11 +3,13 @@ package com.warrior.data.local.entity
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
 /**
  * Local account. See Database Design v4 §1.
  * All timestamps are UTC epoch millis.
  */
+@Serializable
 @Entity(
     tableName = "users",
     indices = [Index(value = ["username"], unique = true)],

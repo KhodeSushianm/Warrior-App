@@ -41,6 +41,7 @@ import com.warrior.feature.auth.AuthScreen
 import com.warrior.feature.history.HistoryDetailScreen
 import com.warrior.feature.history.HistoryScreen
 import com.warrior.feature.home.HomeScreen
+import com.warrior.feature.profile.BodyScreen
 import com.warrior.feature.profile.ProfileScreen
 import com.warrior.feature.progress.ProgressScreen
 import com.warrior.feature.workout.WorkoutLoggingScreen
@@ -142,7 +143,15 @@ private fun MainScreen() {
                 )
             }
             composable<ProgressRoute> { ProgressScreen() }
-            composable<ProfileRoute> { ProfileScreen(version = BuildConfig.VERSION_NAME) }
+            composable<ProfileRoute> {
+                ProfileScreen(
+                    version = BuildConfig.VERSION_NAME,
+                    onOpenBody = { navController.navigate(BodyRoute) },
+                )
+            }
+            composable<BodyRoute> {
+                BodyScreen(onBack = { navController.popBackStack() })
+            }
             composable<WorkoutRoute> { entry ->
                 val route = entry.toRoute<WorkoutRoute>()
                 WorkoutLoggingScreen(

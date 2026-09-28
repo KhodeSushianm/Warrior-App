@@ -4,11 +4,13 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
 /**
  * One round of a round-based activity. See Database Design v4 §4.
  * Durations are milliseconds; (activityId, roundNumber) is unique.
  */
+@Serializable
 @Entity(
     tableName = "rounds",
     foreignKeys = [

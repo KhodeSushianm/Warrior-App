@@ -1,6 +1,10 @@
 package com.warrior.data.local.di
 
+import com.warrior.data.local.repository.JsonBackupRepository
+import com.warrior.data.local.repository.RoomBodyRepository
 import com.warrior.data.local.repository.RoomTrainingRepository
+import com.warrior.domain.progress.BodyRepository
+import com.warrior.domain.training.BackupRepository
 import com.warrior.domain.training.TrainingRepository
 import dagger.Binds
 import dagger.Module
@@ -13,4 +17,10 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindTrainingRepository(impl: RoomTrainingRepository): TrainingRepository
+
+    @Binds
+    abstract fun bindBodyRepository(impl: RoomBodyRepository): BodyRepository
+
+    @Binds
+    abstract fun bindBackupRepository(impl: JsonBackupRepository): BackupRepository
 }

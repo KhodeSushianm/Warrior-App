@@ -22,8 +22,12 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -277,5 +281,58 @@ private fun barPath(
         lineTo(left + rt, top)
         arcTo(Rect(left, top, left + 2 * rt, top + 2 * rt), 270f, -90f, false)
         close()
+    }
+}
+
+/**
+ * Weight-trend line chart (Season 2 / Phase 12): a smooth polyline over
+ * normalized points (0..1, oldest -> newest) with a soft accent fill under the
+ * line and an emphasized latest point. Custom Canvas, like every other chart.
+ */
+@Composable
+fun WeightTrendChart(
+    points: List<Float>,
+    modifier: Modifier = Modifier,
+) {
+    val lineColor = Accent
+    val fillColorTop = Accent.copy(alpha = 0.28f)
+    val fillColorBottom = Accent.copy(alpha = 0f)
+    Canvas(
+        modifier
+            .fillMaxWidth()
+            .height(96.dp),
+    ) {
+        if (points.size < 2) return@Canvas
+        val pad = 6.dp.toPx()
+        val w = size.width - pad * 2
+        val h = size.height - pad * 2
+        val stepX = w / (points.size - 1)
+        val coords = points.mapIndexed { index, value ->
+            Offset(pad + index * stepX, pad + (1f - value.coerceIn(0f, 1f)) * h)
+        }
+        // Fill under the line.
+        val fill = Path().apply {
+            moveTo(coords.first().x, size.height)
+            coords.forEach { lineTo(it.x, it.y) }
+            lineTo(coords.last().x, size.height)
+            close()
+        }
+        drawPath(
+            path = fill,
+            brush = Brush.verticalGradient(listOf(fillColorTop, fillColorBottom)),
+        )
+        // The line itself.
+        val line = Path().apply {
+            moveTo(coords.first().x, coords.first().y)
+            coords.drop(1).forEach { lineTo(it.x, it.y) }
+        }
+        drawPath(
+            path = line,
+            color = lineColor,
+            style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
+        )
+        // History dots + emphasized latest.
+        coords.dropLast(1).forEach { drawCircle(color = lineColor, radius = 2.5.dp.toPx(), center = it) }
+        drawCircle(color = lineColor, radius = 4.5.dp.toPx(), center = coords.last())
     }
 }

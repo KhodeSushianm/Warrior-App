@@ -65,4 +65,12 @@ interface RoundDao {
         """,
     )
     suspend fun delete(userId: Long, roundId: Long)
+
+    /** Full-table read for backup export (Season 2 / Phase 12). */
+    @Query("SELECT * FROM rounds")
+    suspend fun getAllForExport(): List<RoundEntity>
+
+    /** Raw insert with explicit id — used only by backup import (Phase 12). */
+    @Insert
+    suspend fun insertForImport(round: RoundEntity): Long
 }

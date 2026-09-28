@@ -5,6 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.warrior.domain.training.model.Feeling
+import kotlinx.serialization.Serializable
 
 /**
  * One training session. See Database Design v4 §2.
@@ -14,6 +15,7 @@ import com.warrior.domain.training.model.Feeling
  *
  * `date` is the local training day: local midnight stored as UTC epoch millis.
  */
+@Serializable
 @Entity(
     tableName = "training_sessions",
     foreignKeys = [

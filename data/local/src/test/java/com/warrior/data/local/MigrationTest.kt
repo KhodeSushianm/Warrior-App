@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import com.warrior.data.local.database.MIGRATION_1_2
 import com.warrior.data.local.database.WarriorDatabase
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -64,12 +65,70 @@ class MigrationTest {
             close()
         }
 
-        // 2) Reopen with the production database — future migrations run here.
+        // 2) Reopen with the production database — the real migration path runs
+        //    here (v1 -> v2 since Phase 12), exactly like DatabaseModule wires it.
         val context = ApplicationProvider.getApplicationContext<Context>()
-        val db = Room.databaseBuilder(context, WarriorDatabase::class.java, dbName).build()
+        val db = Room.databaseBuilder(context, WarriorDatabase::class.java, dbName)
+            .addMigrations(MIGRATION_1_2)
+            .build()
         val user = db.userDao().getById(1)
         assertEquals("warrior", user?.username)
         assertEquals("The Warrior", user?.displayName)
+        db.close()
+    }
+
+    @Test
+    fun migrate1To2_keepsDataAndMatchesExportedSchema() = runTest {
+        val dbName = "migration-1-2-db"
+
+        // Legacy v1 database with seeded rows.
+        helper.createDatabase(dbName, 1).apply {
+            execSQL(
+                """
+                INSERT INTO users (id, username, displayName, passwordHash, passwordSalt, createdAt, updatedAt)
+                VALUES (1, 'warrior', 'The Warrior', 'hash', 'salt', 1, 1)
+                """.trimIndent(),
+            )
+            execSQL(
+                """
+                INSERT INTO training_sessions
+                    (id, userId, date, startedAt, endedAt, overallIntensity, overallFeeling, notes, createdAt, updatedAt)
+                VALUES (10, 1, 1790121600000, NULL, NULL, 8, 'GOOD', 'v1 session', 1, 1)
+                """.trimIndent(),
+            )
+            close()
+        }
+
+        // Run + validate against the exported 2.json schema.
+        val db = helper.runMigrationsAndValidate(dbName, 2, true, MIGRATION_1_2)
+
+        // v1 rows survived.
+        val users = db.query("SELECT COUNT(*) FROM users")
+        users.moveToFirst()
+        assertEquals(1, users.getInt(0))
+        users.close()
+        val sessions = db.query("SELECT COUNT(*) FROM training_sessions")
+        sessions.moveToFirst()
+        assertEquals(1, sessions.getInt(0))
+        sessions.close()
+
+        // New v2 tables exist and accept writes (FK to users enforced).
+        db.execSQL(
+            """
+            INSERT INTO body_metrics (id, userId, date, weightKg, heightCm, reachCm, bodyFatPercent, restingHeartRate, createdAt, updatedAt)
+            VALUES (1, 1, 1790121600000, 78.5, 182.0, NULL, NULL, 55, 1, 1)
+            """.trimIndent(),
+        )
+        db.execSQL(
+            """
+            INSERT INTO session_tags (id, sessionId, userId, tag, createdAt)
+            VALUES (1, 10, 1, 'camp', 1)
+            """.trimIndent(),
+        )
+        val metrics = db.query("SELECT weightKg FROM body_metrics WHERE id = 1")
+        metrics.moveToFirst()
+        assertEquals(78.5f, metrics.getFloat(0), 0.001f)
+        metrics.close()
         db.close()
     }
 }

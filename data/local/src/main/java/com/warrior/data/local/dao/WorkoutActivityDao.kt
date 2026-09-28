@@ -72,4 +72,12 @@ interface WorkoutActivityDao {
         """,
     )
     suspend fun delete(userId: Long, activityId: Long)
+
+    /** Full-table read for backup export (Season 2 / Phase 12). */
+    @Query("SELECT * FROM workout_activities")
+    suspend fun getAllForExport(): List<WorkoutActivityEntity>
+
+    /** Raw insert with explicit id — used only by backup import (Phase 12). */
+    @Insert
+    suspend fun insertForImport(activity: WorkoutActivityEntity): Long
 }

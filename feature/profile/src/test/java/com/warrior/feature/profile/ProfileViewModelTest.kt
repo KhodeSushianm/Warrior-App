@@ -9,6 +9,8 @@ import com.warrior.domain.auth.usecase.Logout
 import com.warrior.domain.auth.usecase.ObserveSession
 import com.warrior.domain.auth.usecase.UpdateAccount
 import com.warrior.domain.auth.validation.AuthErrorCode
+import com.warrior.domain.training.BackupFormatException
+import com.warrior.domain.training.BackupRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,11 +45,14 @@ class ProfileViewModelTest {
         Dispatchers.resetMain()
     }
 
+    private val backup = FakeBackupRepository()
+
     private fun buildViewModel() = ProfileViewModel(
         observeSession = ObserveSession(session),
         getAccount = GetAccount(repository),
         updateAccount = UpdateAccount(repository),
         logout = Logout(session),
+        backupRepository = backup,
     )
 
     @Test
@@ -140,6 +145,69 @@ class ProfileViewModelTest {
         viewModel.onAboutClose()
         assertFalse(viewModel.state.value.showAbout)
     }
+
+    @Test
+    fun export_producesPayloadAndReportsResult() = runTest {
+        val id = repository.register("warrior", "Name", "password123")
+        session.start(id)
+        val viewModel = buildViewModel()
+
+        viewModel.onExportStarted()
+        val payload = viewModel.exportPayload()
+        assertEquals(FakeBackupRepository.PAYLOAD, payload)
+        viewModel.onExportFinished(true)
+
+        assertEquals(true, viewModel.state.value.exportDone)
+        assertEquals(false, viewModel.state.value.isExporting)
+        viewModel.onExportResultDismiss()
+        assertEquals(null, viewModel.state.value.exportDone)
+    }
+
+    @Test
+    fun import_validBackup_confirmsThenRestoresAndSignsOutOnDismiss() = runTest {
+        val id = repository.register("warrior", "Name", "password123")
+        session.start(id)
+        val viewModel = buildViewModel()
+
+        viewModel.onImportJson(FakeBackupRepository.PAYLOAD)
+        assertTrue(viewModel.state.value.showImportConfirm)
+
+        viewModel.onImportConfirm()
+        val result = viewModel.state.value.importResult
+        assertTrue(result is ProfileViewModel.ImportResult.Success)
+        assertEquals(7, (result as ProfileViewModel.ImportResult.Success).sessionsRestored)
+        // still signed in until the result dialog is dismissed
+        assertEquals(id, session.currentUserId.first())
+
+        viewModel.onImportResultDismiss()
+        assertEquals(null, viewModel.state.value.importResult)
+        assertEquals(null, session.currentUserId.first())
+    }
+
+    @Test
+    fun import_invalidFile_showsInvalidAndKeepsSession() = runTest {
+        val id = repository.register("warrior", "Name", "password123")
+        session.start(id)
+        val viewModel = buildViewModel()
+
+        viewModel.onImportJson("this is not json")
+        assertTrue(viewModel.state.value.showImportConfirm)
+        viewModel.onImportConfirm()
+
+        assertEquals(ProfileViewModel.ImportResult.Invalid, viewModel.state.value.importResult)
+        viewModel.onImportResultDismiss()
+        assertEquals(id, session.currentUserId.first()) // not signed out
+    }
+
+    @Test
+    fun import_blankOrNull_goesStraightToInvalid() = runTest {
+        session.start(repository.register("warrior", "Name", "password123"))
+        val viewModel = buildViewModel()
+
+        viewModel.onImportJson(null)
+        assertEquals(ProfileViewModel.ImportResult.Invalid, viewModel.state.value.importResult)
+        assertEquals(false, viewModel.state.value.showImportConfirm)
+    }
 }
 
 /** In-memory auth repository fake (mirrors the domain-module fake). */
@@ -172,6 +240,22 @@ internal class FakeAuthRepository : AuthRepository {
         val clash = rows.values.firstOrNull { it.username == username && it.id != userId }
         if (clash != null) throw DuplicateUsernameException(username)
         rows[userId] = current.copy(displayName = displayName, username = username)
+    }
+}
+
+private class FakeBackupRepository : BackupRepository {
+    var importedJson: String? = null
+
+    override suspend fun exportAll(): String = PAYLOAD
+
+    override suspend fun importAll(json: String): Int {
+        if (json != PAYLOAD) throw BackupFormatException("bad payload")
+        importedJson = json
+        return 7
+    }
+
+    companion object {
+        const val PAYLOAD = "{\"app\":\"WARRIOR\",\"formatVersion\":1}"
     }
 }
 

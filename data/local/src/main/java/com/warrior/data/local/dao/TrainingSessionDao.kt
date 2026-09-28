@@ -132,4 +132,12 @@ abstract class TrainingSessionDao {
             insertRounds(allRounds)
         }
     }
+
+    /** Full-table read for backup export (Season 2 / Phase 12). */
+    @Query("SELECT * FROM training_sessions")
+    abstract suspend fun getAllForExport(): List<TrainingSessionEntity>
+
+    /** Raw insert with explicit id — used only by backup import (Phase 12). */
+    @Insert
+    abstract suspend fun insertForImport(session: TrainingSessionEntity): Long
 }
