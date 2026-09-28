@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_title">پروفایل</string>
+    <string name="profile_local_account">%1$s@ · حساب محلی</string>
+
+    <string name="profile_row_body">بدن ورزشکار</string>
+    <string name="profile_row_edit">ویرایش پروفایل</string>
+    <string name="profile_row_export">پشتیبان‌گیری</string>
+    <string name="profile_row_import">بازیابی پشتیبان</string>
+    <string name="profile_badge_offline">آفلاین</string>
+    <string name="profile_row_about">درباره · نسخهٔ %1$s</string>
+    <string name="profile_row_language">زبان</string>
+    <string name="profile_row_calendar">تقویم</string>
+    <string name="profile_language_dialog_title">زبان نمایش</string>
+    <string name="profile_language_system">پیش‌فرض سیستم</string>
+    <string name="profile_language_en">English</string>
+    <string name="profile_language_fa">فارسی</string>
+    <string name="profile_calendar_dialog_title">تقویم نمایش</string>
+    <string name="profile_calendar_gregorian">میلادی</string>
+    <string name="profile_calendar_jalali">شمسی (جلالی)</string>
+
+    <string name="profile_privacy_body">همهٔ داده‌های تمرینی فقط روی همین دستگاه ذخیره می‌شوند (Room/SQLite). رمز عبور به‌صورت هش PBKDF2 با salt اختصاصی هر کاربر نگهداری می‌شود — هرگز به‌صورت متن ساده.</string>
+    <string name="profile_logout">خروج از حساب</string>
+
+    <string name="profile_edit_title">ویرایش پروفایل</string>
+    <string name="profile_field_display_name">نام نمایشی</string>
+    <string name="profile_field_username">نام کاربری</string>
+    <string name="profile_action_save">ذخیره</string>
+    <string name="profile_action_cancel">انصراف</string>
+    <string name="profile_action_ok">تایید</string>
+
+    <string name="profile_about_title">دربارهٔ WARRIOR</string>
+    <string name="profile_about_body">WARRIOR یک دفترچهٔ تمرین آفلاین برای بوکسورهاست: جلسه ثبت کنید، تاریخچه را دنبال کنید و پیشرفت خود را تحلیل کنید — کاملاً بدون اینترنت. داده‌های شما هرگز از این دستگاه خارج نمی‌شوند.</string>
+    <string name="profile_about_version">نسخهٔ %1$s</string>
+
+    <string name="profile_export_success_title">پشتیبان گرفته شد</string>
+    <string name="profile_export_success_body">فایل پشتیبان WARRIOR ذخیره شد. آن را در جای امن نگه دارید — همه‌چیز، حتی حساب‌ها، را بازیابی می‌کند.</string>
+    <string name="profile_export_failed_title">خطا در پشتیبان‌گیری</string>
+    <string name="profile_export_failed_body">نوشتن فایل پشتیبان ناموفق بود. دوباره تلاش کنید.</string>
+    <string name="profile_import_confirm_title">بازیابی پشتیبان؟</string>
+    <string name="profile_import_confirm_body">این عمل همهٔ داده‌های دستگاه را با محتوای فایل پشتیبان جایگزین می‌کند — از جمله حساب‌ها. سپس از حساب خارج می‌شوید.</string>
+    <string name="profile_import_confirm_action">جایگزینی و بازیابی</string>
+    <string name="profile_import_success_title">پشتیبان بازیابی شد</string>
+    <string name="profile_import_success_body">%1$d جلسهٔ تمرین بازیابی شد. با یکی از حساب‌های بازیابی‌شده وارد شوید.</string>
+    <string name="profile_import_invalid_title">این فایل پشتیبان WARRIOR نیست</string>
+    <string name="profile_import_invalid_body">فایل معتبر نیست (یا نسخهٔ قالب آن پشتیبانی نمی‌شود). هیچ تغییری اعمال نشد.</string>
+    <string name="profile_import_failed_title">خطا در بازیابی</string>
+    <string name="profile_import_failed_body">بازیابی کامل نشد. داده‌های فعلی شما تغییر نکردند.</string>
+
+    <string name="profile_error_username_format">نام کاربری باید ۳ تا ۳۰ نویسه شامل حروف کوچک انگلیسی، عدد یا _ باشد</string>
+    <string name="profile_error_display_name_invalid">نام نمایشی باید ۱ تا ۵۰ نویسه و غیرخالی باشد</string>
+    <string name="profile_error_duplicate_username">این نام کاربری قبلاً روی این دستگاه گرفته شده</string>
+    <string name="profile_error_unexpected">ذخیرهٔ پروفایل ناموفق بود — دوباره تلاش کنید</string>
+
+    <string name="body_title">بدن ورزشکار</string>
+    <string name="body_add">+ ثبت اندازه‌گیری</string>
+    <string name="body_empty_title">هنوز اندازه‌گیری ندارید</string>
+    <string name="body_empty_body">وزن، قد و ریچ خود را ثبت کنید تا پیش از کمپ یا مسابقه روندها را ببینید.</string>
+    <string name="body_latest_weight">وزن فعلی</string>
+    <string name="body_unit_kg">کیلوگرم</string>
+    <string name="body_day_today">امروز</string>
+    <string name="body_day_yesterday">دیروز</string>
+    <string name="body_trend_title">روند وزن</string>
+    <string name="body_measurements_title">اندازه‌گیری‌ها</string>
+    <string name="body_height">قد</string>
+    <string name="body_reach">ریچ (طول دست)</string>
+    <string name="body_bodyfat">چربی بدن</string>
+    <string name="body_hr">ضربان استراحت</string>
+    <string name="body_history_title">تاریخچه</string>
+    <string name="body_dialog_title">اندازه‌گیری جدید</string>
+    <string name="body_field_weight">وزن (کیلوگرم) *</string>
+    <string name="body_field_height">قد (سانتی‌متر)</string>
+    <string name="body_field_reach">ریچ (سانتی‌متر)</string>
+    <string name="body_field_bodyfat">چربی بدن (٪)</string>
+    <string name="body_field_hr">ضربان قلب استراحت (bpm)</string>
+    <string name="body_save">ذخیره</string>
+    <string name="body_cancel">انصراف</string>
+    <string name="body_delete_title">این اندازه‌گیری حذف شود؟</string>
+    <string name="body_delete_body">این نقطه از تاریخچهٔ شما حذف می‌شود.</string>
+    <string name="body_delete_confirm">حذف</string>
+
+    <string name="body_error_weight">وزن باید بین ۲۰ تا ۴۰۰ کیلوگرم باشد</string>
+    <string name="body_error_height">قد باید بین ۱۰۰ تا ۲۵۰ سانتی‌متر باشد</string>
+    <string name="body_error_reach">ریچ باید بین ۱۰۰ تا ۲۵۰ سانتی‌متر باشد</string>
+    <string name="body_error_bodyfat">چربی بدن باید بین ۳ تا ۷۰ درصد باشد</string>
+    <string name="body_error_hr">ضربان استراحت باید بین ۳۰ تا ۲۲۰ باشد</string>
+    <string name="body_error_date">تاریخ نامعتبر است</string>
+    <string name="body_error_unexpected">ذخیرهٔ اندازه‌گیری ناموفق بود — دوباره تلاش کنید</string>
+</resources>

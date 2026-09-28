@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_wordmark">WARRIOR</string>
+    <string name="home_log_workout_cd">ثبت تمرین</string>
+    <string name="home_this_week">این هفته</string>
+    <string name="home_this_week_range">این هفته · %1$s</string>
+    <string name="home_training_time">زمان تمرین</string>
+    <string name="home_stat_sessions">جلسات</string>
+    <string name="home_stat_rounds">راندها</string>
+    <string name="home_stat_avg_intensity">میانگین شدت</string>
+
+    <string name="home_heatmap_title">روزهای تمرین · ۳ ماه اخیر</string>
+
+    <string name="home_recent_title">جلسات اخیر</string>
+    <string name="home_recent_empty_title">هنوز جلسه‌ای ندارید</string>
+    <string name="home_recent_empty_body">اولین تمرین خود را ثبت کنید تا جلسات اخیر اینجا نمایش داده شوند.</string>
+    <string name="home_session_meta">%1$s · %2$s · شدت %3$d</string>
+
+    <string name="home_records_title">رکوردهای شخصی</string>
+    <string name="home_record_longest">طولانی‌ترین جلسه</string>
+    <string name="home_record_most_rounds">بیشترین راند در یک جلسه</string>
+    <string name="home_record_streak">هفته‌های پیوسته</string>
+
+    <string name="home_cta_log_workout">+ ثبت تمرین</string>
+    <string name="home_delta_unit_minutes">د</string>
+
+    <plurals name="home_streak_weeks">
+        <item quantity="one">%d هفته</item>
+        <item quantity="other">%d هفته</item>
+    </plurals>
+</resources>

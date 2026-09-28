@@ -18,8 +18,8 @@ class ObserveHomeProgress @Inject constructor(
     private val calculator: ProgressCalculator,
     private val timeProvider: TimeProvider,
 ) {
-    operator fun invoke(userId: Long): Flow<HomeProgress> =
+    operator fun invoke(userId: Long, jalali: Boolean = false): Flow<HomeProgress> =
         getTrainingHistory(userId).map { sessions ->
-            calculator.homeProgress(sessions, timeProvider.nowMillis())
+            calculator.homeProgress(sessions, timeProvider.nowMillis(), jalali)
         }
 }

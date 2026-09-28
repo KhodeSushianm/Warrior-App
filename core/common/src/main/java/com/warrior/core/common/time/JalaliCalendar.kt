@@ -53,6 +53,9 @@ object JalaliCalendar {
 
     fun monthNameFa(jm: Int): String = MONTH_NAMES_FA[jm - 1]
 
+    /** Common one-letter Persian weekday abbreviations (index = Calendar.SUNDAY-1 .. SATURDAY-1). */
+    val WEEK_DAY_NAMES_SHORT_FA = listOf("ی", "د", "س", "چ", "پ", "ج", "ش")
+
     fun weekDayNameFa(javaDayOfWeek: Int): String = WEEK_DAY_NAMES_FA[javaDayOfWeek - 1]
 
     /** Converts ASCII digits to Persian digits (used for fa/Jalali labels). */

@@ -6,8 +6,8 @@
 | فاز | عنوان | خروجی‌های کلیدی | وضعیت |
 |---|---|---|---|
 | ۱۲ | Database v2 + Body Metrics + Backup | مهاجرت v1→v2 (جداول `body_metrics` و `session_tags`)، تست Migration، متریک‌های بدن (دامنه+دیتا+UI در Profile)، Export/Import کامل JSON از طریق SAF | ✅ — [گزارش](phase-reports/12-database-v2-body-backup.md) |
-| ۱۳ | Persian + RTL + Jalali | `values-fa` همهٔ ماژول‌ها، سوییچ زبان درون‌اپی (بدون appcompat)، تقویم شمسی نمایشی (ذخیره‌سازی UTC بدون تغییر)، RTL یکدست | 🔄 |
-| ۱۴ | Live Round Timer | حالت تمرین زنده: تایمر کار/استراحت، بوق+ویبره، پیشروی خودکار راند، ثبت خودکار Session از تایمرها، تنظیمات پیش‌فرض در DataStore | ⏸ |
+| ۱۳ | Persian + RTL + Jalali | `values-fa` همهٔ ماژول‌ها، سوییچ زبان درون‌اپی (بدون appcompat)، تقویم شمسی نمایشی (ذخیره‌سازی UTC بدون تغییر)، RTL یکدست | ✅ — [گزارش](phase-reports/13-persian-rtl-jalali.md) |
+| ۱۴ | Live Round Timer | حالت تمرین زنده: تایمر کار/استراحت، بوق+ویبره، پیشروی خودکار راند، ثبت خودکار Session از تایمرها، تنظیمات پیش‌فرض در DataStore | 🔄 |
 | ۱۵ | Templates + Goals | الگوهای تمرین (DataStore JSON، scoped به کاربر)، Quick-Add از Home، اهداف هفتگی (جلسه/دقیقه) + رینگ پیشرفت، Streak Freeze | ⏸ |
 | ۱۶ | Analytics + Smart PRs | نمودار روند شدت/حجم، رادار Focus، توزیع روزهای هفته، کارت‌های Insight متنی، PR تفکیک‌شده بر اساس نوع فعالیت + جشن رکوردشکنی هنگام Save | ⏸ |
 | ۱۷ | Achievements + Search + Widget | مدال‌ها/بج‌ها (مشتق از داده + اطلاعیه)، جستجوی full-text در Notes، فیلتر تگ‌ها (از جدول `session_tags` فاز ۱۲)، ویجت Glance خانه | ⏸ |

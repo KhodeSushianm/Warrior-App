@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auth_wordmark">WARRIOR</string>
+    <string name="auth_tagline">ثبت · ردیابی · تحلیل · پیشرفت</string>
+    <string name="auth_field_display_name">نام نمایشی</string>
+    <string name="auth_field_username">نام کاربری</string>
+    <string name="auth_field_password">رمز عبور</string>
+    <string name="auth_action_login">ورود</string>
+    <string name="auth_action_register">ساخت حساب</string>
+    <string name="auth_action_back_to_login">بازگشت به ورود</string>
+    <string name="auth_local_only_note">حساب کاملاً محلی — داده‌های شما هرگز از این دستگاه خارج نمی‌شوند.</string>
+
+    <string name="auth_error_username_format">نام کاربری باید ۳ تا ۳۰ نویسه شامل حروف کوچک انگلیسی، عدد یا _ باشد</string>
+    <string name="auth_error_display_name_invalid">نام نمایشی باید ۱ تا ۵۰ نویسه و غیرخالی باشد</string>
+    <string name="auth_error_password_too_short">رمز عبور باید حداقل ۸ نویسه باشد</string>
+    <string name="auth_error_username_blank">نام کاربری نمی‌تواند خالی باشد</string>
+    <string name="auth_error_password_empty">رمز عبور نمی‌تواند خالی باشد</string>
+    <string name="auth_error_duplicate_username">این نام کاربری قبلاً روی این دستگاه گرفته شده</string>
+    <string name="auth_error_invalid_credentials">نام کاربری یا رمز عبور اشتباه است</string>
+    <string name="auth_error_unexpected">خطای غیرمنتظره — دوباره تلاش کنید</string>
+</resources>

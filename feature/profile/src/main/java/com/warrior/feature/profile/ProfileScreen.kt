@@ -1,5 +1,6 @@
 package com.warrior.feature.profile
 
+import android.app.Activity
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -48,6 +49,7 @@ import com.warrior.core.designsystem.theme.AccentSoft
 import com.warrior.core.designsystem.theme.Negative
 import com.warrior.core.designsystem.theme.TextMuted
 import com.warrior.core.designsystem.theme.TextPrimary
+import com.warrior.domain.auth.AppPreferences
 import com.warrior.domain.auth.validation.AuthErrorCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -73,6 +75,17 @@ fun ProfileScreen(
     val account = state.account
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    // Changing the display language re-creates the activity so the whole tree
+    // picks up the new locale (attachBaseContext wrapper).
+    val activity = context as? Activity
+    var lastLanguage by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(state.language) {
+        if (lastLanguage != null && lastLanguage != state.language) {
+            activity?.recreate()
+        }
+        lastLanguage = state.language
+    }
 
     // SAF: create the export document, then write the payload the VM builds.
     val exportLauncher = rememberLauncherForActivityResult(
@@ -162,6 +175,16 @@ fun ProfileScreen(
             ActionRow(
                 text = stringResource(R.string.profile_row_import),
                 onClick = { importLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) },
+            )
+            ActionRow(
+                text = stringResource(R.string.profile_row_language),
+                badge = languageLabel(state.language),
+                onClick = viewModel::onLanguageOpen,
+            )
+            ActionRow(
+                text = stringResource(R.string.profile_row_calendar),
+                badge = calendarLabel(state.calendar),
+                onClick = viewModel::onCalendarOpen,
             )
             ActionRow(
                 text = stringResource(R.string.profile_row_about, version),
@@ -257,6 +280,33 @@ fun ProfileScreen(
         )
     }
 
+    if (state.showLanguageDialog) {
+        ChoiceDialog(
+            title = stringResource(R.string.profile_language_dialog_title),
+            options = listOf(
+                AppPreferences.LANG_SYSTEM to stringResource(R.string.profile_language_system),
+                AppPreferences.LANG_EN to stringResource(R.string.profile_language_en),
+                AppPreferences.LANG_FA to stringResource(R.string.profile_language_fa),
+            ),
+            selected = state.language,
+            onSelect = viewModel::onLanguageSelect,
+            onDismiss = viewModel::onLanguageClose,
+        )
+    }
+
+    if (state.showCalendarDialog) {
+        ChoiceDialog(
+            title = stringResource(R.string.profile_calendar_dialog_title),
+            options = listOf(
+                AppPreferences.CALENDAR_GREGORIAN to stringResource(R.string.profile_calendar_gregorian),
+                AppPreferences.CALENDAR_JALALI to stringResource(R.string.profile_calendar_jalali),
+            ),
+            selected = state.calendar,
+            onSelect = viewModel::onCalendarSelect,
+            onDismiss = viewModel::onCalendarClose,
+        )
+    }
+
     // ---------- backup dialogs ----------
 
     if (state.showImportConfirm) {
@@ -336,6 +386,53 @@ fun ProfileScreen(
         )
     }
 }
+
+@Composable
+private fun ChoiceDialog(
+    title: String,
+    options: List<Pair<String, String>>,
+    selected: String,
+    onSelect: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            Column {
+                options.forEach { (value, label) ->
+                    val isSelected = value == selected
+                    Text(
+                        text = if (isSelected) "●  $label" else "○  $label",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = if (isSelected) Accent else TextPrimary,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onSelect(value) }
+                            .padding(vertical = 12.dp),
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.profile_action_cancel)) }
+        },
+    )
+}
+
+@Composable
+private fun languageLabel(tag: String): String = stringResource(
+    when (tag) {
+        AppPreferences.LANG_EN -> R.string.profile_language_en
+        AppPreferences.LANG_FA -> R.string.profile_language_fa
+        else -> R.string.profile_language_system
+    },
+)
+
+@Composable
+private fun calendarLabel(id: String): String = stringResource(
+    if (id == AppPreferences.CALENDAR_JALALI) R.string.profile_calendar_jalali else R.string.profile_calendar_gregorian,
+)
 
 @Composable
 private fun ActionRow(text: String, badge: String? = null, onClick: (() -> Unit)?) {

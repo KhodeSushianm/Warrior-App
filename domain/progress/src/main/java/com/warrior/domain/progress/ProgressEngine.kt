@@ -1,5 +1,6 @@
 package com.warrior.domain.progress
 
+import com.warrior.core.common.time.JalaliCalendar
 import com.warrior.domain.progress.model.FocusSlice
 import com.warrior.domain.progress.model.MonthHeatmap
 import com.warrior.domain.progress.model.PersonalRecords
@@ -172,7 +173,9 @@ object ProgressEngine {
         nowMillis: Long,
         zone: TimeZone,
         monthCount: Int = 3,
+        jalali: Boolean = false,
     ): TrainingHeatmap {
+        if (jalali) return monthsHeatmapJalali(sessions, nowMillis, zone, monthCount)
         val now = Calendar.getInstance(zone).apply { timeInMillis = nowMillis }
         val currentYear = now.get(Calendar.YEAR)
         val currentMonth0 = now.get(Calendar.MONTH)
@@ -202,6 +205,59 @@ object ProgressEngine {
                 daysInMonth = monthCal.getActualMaximum(Calendar.DAY_OF_MONTH),
                 trainedDays = trained[year * 100 + month0]?.toSet() ?: emptySet(),
                 todayDay = if (back == 0) todayDay else null,
+            )
+        }
+        return TrainingHeatmap(months)
+    }
+
+    /**
+     * Jalali variant (Phase 13): buckets by Persian months, keeps the same
+     * Saturday-first columns (the week rule is calendar-independent).
+     */
+    private fun monthsHeatmapJalali(
+        sessions: List<TrainingSession>,
+        nowMillis: Long,
+        zone: TimeZone,
+        monthCount: Int,
+    ): TrainingHeatmap {
+        val calendar = Calendar.getInstance(zone)
+        fun jalaliOf(millis: Long): JalaliCalendar.JalaliDate {
+            calendar.timeInMillis = millis
+            return JalaliCalendar.gregorianToJalali(
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH) + 1,
+                calendar.get(Calendar.DAY_OF_MONTH),
+            )
+        }
+
+        val nowJalali = jalaliOf(nowMillis)
+        val trained = HashMap<Int, MutableSet<Int>>()
+        sessions.forEach { session ->
+            val j = jalaliOf(session.date)
+            trained.getOrPut(j.year * 100 + j.month) { mutableSetOf() }.add(j.day)
+        }
+
+        val months = (monthCount - 1 downTo 0).map { back ->
+            var jy = nowJalali.year
+            var jm = nowJalali.month - back
+            while (jm < 1) {
+                jm += 12
+                jy--
+            }
+            val (gy, gm, gd) = JalaliCalendar.jalaliToGregorian(jy, jm, 1)
+            val firstCal = Calendar.getInstance(zone).apply {
+                clear()
+                set(gy, gm - 1, gd)
+            }
+            val offset =
+                ((firstCal.get(Calendar.DAY_OF_WEEK) - WeekBoundaryProvider.WEEK_START_DAY) + 7) % 7
+            MonthHeatmap(
+                year = jy,
+                month = jm,
+                firstDayColumnOffset = offset,
+                daysInMonth = JalaliCalendar.jalaliMonthLength(jy, jm),
+                trainedDays = trained[jy * 100 + jm]?.toSet() ?: emptySet(),
+                todayDay = if (back == 0) nowJalali.day else null,
             )
         }
         return TrainingHeatmap(months)

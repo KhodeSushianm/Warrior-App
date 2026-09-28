@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="progress_title">پیشرفت</string>
+    <string name="progress_compare_header">%1$s در برابر هفتهٔ قبل</string>
+    <string name="progress_row_sessions">جلسات</string>
+    <string name="progress_row_training_time">زمان تمرین</string>
+    <string name="progress_row_rounds">راندها</string>
+    <string name="progress_row_avg_intensity">میانگین شدت</string>
+    <string name="progress_row_training_days">روزهای تمرین</string>
+    <string name="progress_delta_unit_minutes">د</string>
+
+    <string name="progress_empty_title">هنوز دادهٔ تمرینی ندارید</string>
+    <string name="progress_empty_body">تمرین‌ها را ثبت کنید تا روند حجم و توزیع‌ها اینجا ظاهر شوند.</string>
+
+    <string name="progress_volume_title">حجم تمرین · %1$d هفتهٔ اخیر</string>
+    <string name="progress_volume_now">اکنون</string>
+    <string name="progress_volume_week_offset">ه-%1$d</string>
+
+    <string name="progress_workout_distribution_title">توزیع نوع تمرین</string>
+    <string name="progress_focus_distribution_title">توزیع تمرکز</string>
+    <string name="progress_distribution_empty">هنوز فعالیتی ثبت نشده است.</string>
+    <string name="progress_percent_value">٪%1$d</string>
+</resources>

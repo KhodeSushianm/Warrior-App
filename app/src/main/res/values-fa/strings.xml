@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_home">خانه</string>
+    <string name="nav_history">تاریخچه</string>
+    <string name="nav_progress">پیشرفت</string>
+    <string name="nav_profile">پروفایل</string>
+</resources>

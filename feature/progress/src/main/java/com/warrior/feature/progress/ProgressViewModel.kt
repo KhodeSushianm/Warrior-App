@@ -2,7 +2,8 @@ package com.warrior.feature.progress
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.warrior.core.common.time.DateFormats
+import com.warrior.core.common.time.DisplayCalendar
+import com.warrior.domain.auth.AppPreferences
 import com.warrior.domain.auth.usecase.ObserveSession
 import com.warrior.domain.progress.model.ProgressSnapshot
 import com.warrior.domain.progress.usecase.ObserveProgress
@@ -11,8 +12,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,12 +30,13 @@ import javax.inject.Inject
 class ProgressViewModel @Inject constructor(
     observeSession: ObserveSession,
     observeProgress: ObserveProgress,
+    appPreferences: AppPreferences,
 ) : ViewModel() {
 
     data class UiState(
         val loaded: Boolean = false,
         val snapshot: ProgressSnapshot? = null,
-        val weekRangeLabel: String = "",
+        val calendar: DisplayCalendar = DisplayCalendar.GREGORIAN,
         val volumeFractions: List<Float> = emptyList(),
     )
 
@@ -41,18 +45,24 @@ class ProgressViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            observeSession()
-                .flatMapLatest { userId ->
-                    if (userId == null) flowOf(null) else observeProgress(userId)
+            combine(observeSession(), appPreferences.calendar) { userId, cal -> userId to cal }
+                .flatMapLatest { (userId, cal) ->
+                    if (userId == null) {
+                        flowOf(null to cal)
+                    } else {
+                        observeProgress(userId).map { snapshot -> snapshot to cal }
+                    }
                 }
-                .collect { snapshot ->
+                .collect { (snapshot, cal) ->
                     _state.update {
                         it.copy(
                             loaded = true,
                             snapshot = snapshot,
-                            weekRangeLabel = snapshot?.let { s ->
-                                DateFormats.weekRange(s.thisWeek.weekStart, s.thisWeek.weekEndExclusive)
-                            } ?: "",
+                            calendar = if (cal == AppPreferences.CALENDAR_JALALI) {
+                                DisplayCalendar.JALALI
+                            } else {
+                                DisplayCalendar.GREGORIAN
+                            },
                             volumeFractions = snapshot?.let(::volumeFractions) ?: emptyList(),
                         )
                     }

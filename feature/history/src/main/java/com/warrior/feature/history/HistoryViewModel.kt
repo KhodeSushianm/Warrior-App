@@ -2,6 +2,8 @@ package com.warrior.feature.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.warrior.core.common.time.DisplayCalendar
+import com.warrior.domain.auth.AppPreferences
 import com.warrior.domain.auth.usecase.ObserveSession
 import com.warrior.domain.training.model.TrainingSession
 import com.warrior.domain.training.usecase.DeleteTrainingSession
@@ -10,9 +12,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,6 +26,7 @@ class HistoryViewModel @Inject constructor(
     getTrainingHistory: GetTrainingHistory,
     private val observeSession: ObserveSession,
     private val deleteTrainingSession: DeleteTrainingSession,
+    appPreferences: AppPreferences,
 ) : ViewModel() {
 
     data class DayGroup(
@@ -33,6 +38,7 @@ class HistoryViewModel @Inject constructor(
         val groups: List<DayGroup> = emptyList(),
         val loaded: Boolean = false,
         val pendingDelete: Long? = null,
+        val calendar: DisplayCalendar = DisplayCalendar.GREGORIAN,
     )
 
     private val _state = MutableStateFlow(UiState())
@@ -40,11 +46,15 @@ class HistoryViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            observeSession()
-                .flatMapLatest { userId ->
-                    if (userId == null) flowOf(emptyList()) else getTrainingHistory(userId)
+            combine(observeSession(), appPreferences.calendar) { userId, cal -> userId to cal }
+                .flatMapLatest { (userId, cal) ->
+                    if (userId == null) {
+                        flowOf(emptyList<TrainingSession>() to cal)
+                    } else {
+                        getTrainingHistory(userId).map { sessions -> sessions to cal }
+                    }
                 }
-                .collect { sessions ->
+                .collect { (sessions, cal) ->
                     _state.update {
                         it.copy(
                             groups = sessions
@@ -57,6 +67,11 @@ class HistoryViewModel @Inject constructor(
                                     )
                                 },
                             loaded = true,
+                            calendar = if (cal == AppPreferences.CALENDAR_JALALI) {
+                                DisplayCalendar.JALALI
+                            } else {
+                                DisplayCalendar.GREGORIAN
+                            },
                         )
                     }
                 }

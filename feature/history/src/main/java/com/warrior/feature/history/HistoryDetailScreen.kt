@@ -23,11 +23,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.warrior.core.common.time.DateFormats
+import com.warrior.core.common.time.DisplayCalendar
 import com.warrior.core.designsystem.components.WarriorBadge
 import com.warrior.core.designsystem.components.WarriorButton
 import com.warrior.core.designsystem.components.WarriorButtonVariant
 import com.warrior.core.designsystem.components.WarriorCard
 import com.warrior.core.designsystem.components.WarriorTopBar
+import com.warrior.core.designsystem.components.rememberUiLocale
 import com.warrior.core.designsystem.theme.Negative
 import com.warrior.core.designsystem.theme.TextMuted
 import com.warrior.domain.training.model.TrainingSession
@@ -72,7 +74,7 @@ fun HistoryDetailScreen(
                 WarriorCard { Text(stringResource(R.string.history_detail_not_found), style = MaterialTheme.typography.titleMedium) }
             }
         } else {
-            HeaderCard(session)
+            HeaderCard(session, state.calendar)
             Spacer(Modifier.height(12.dp))
             session.activities.forEach { activity ->
                 WarriorCard {
@@ -153,13 +155,15 @@ fun HistoryDetailScreen(
 }
 
 @Composable
-private fun HeaderCard(session: TrainingSession) {
+private fun HeaderCard(session: TrainingSession, calendar: DisplayCalendar) {
     WarriorCard {
         Text(
             DateFormats.dayHeader(
                 session.date,
                 todayLabel = stringResource(R.string.history_day_today),
                 yesterdayLabel = stringResource(R.string.history_day_yesterday),
+                calendar = calendar,
+                locale = rememberUiLocale(),
             ),
             style = MaterialTheme.typography.titleLarge,
         )

@@ -2,6 +2,7 @@ package com.warrior.feature.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.warrior.domain.auth.AppPreferences
 import com.warrior.domain.auth.DuplicateUsernameException
 import com.warrior.domain.auth.LocalAccount
 import com.warrior.domain.auth.usecase.GetAccount
@@ -34,6 +35,7 @@ class ProfileViewModel @Inject constructor(
     private val updateAccount: UpdateAccount,
     private val logout: Logout,
     private val backupRepository: BackupRepository,
+    private val appPreferences: AppPreferences,
 ) : ViewModel() {
 
     sealed interface ImportResult {
@@ -56,6 +58,10 @@ class ProfileViewModel @Inject constructor(
         val showImportConfirm: Boolean = false,
         val isImporting: Boolean = false,
         val importResult: ImportResult? = null,
+        val language: String = AppPreferences.LANG_SYSTEM,
+        val calendar: String = AppPreferences.CALENDAR_GREGORIAN,
+        val showLanguageDialog: Boolean = false,
+        val showCalendarDialog: Boolean = false,
     )
 
     private val _state = MutableStateFlow(UiState())
@@ -70,6 +76,36 @@ class ProfileViewModel @Inject constructor(
                 val account = userId?.let { getAccount(it) }
                 _state.update { it.copy(account = account) }
             }
+        }
+        viewModelScope.launch {
+            appPreferences.language.collect { tag -> _state.update { it.copy(language = tag) } }
+        }
+        viewModelScope.launch {
+            appPreferences.calendar.collect { id -> _state.update { it.copy(calendar = id) } }
+        }
+    }
+
+    // ---------- display settings (Phase 13) ----------
+
+    fun onLanguageOpen() = _state.update { it.copy(showLanguageDialog = true) }
+
+    fun onLanguageClose() = _state.update { it.copy(showLanguageDialog = false) }
+
+    fun onLanguageSelect(tag: String) {
+        viewModelScope.launch {
+            appPreferences.setLanguage(tag)
+            _state.update { it.copy(showLanguageDialog = false) }
+        }
+    }
+
+    fun onCalendarOpen() = _state.update { it.copy(showCalendarDialog = true) }
+
+    fun onCalendarClose() = _state.update { it.copy(showCalendarDialog = false) }
+
+    fun onCalendarSelect(id: String) {
+        viewModelScope.launch {
+            appPreferences.setCalendar(id)
+            _state.update { it.copy(showCalendarDialog = false) }
         }
     }
 

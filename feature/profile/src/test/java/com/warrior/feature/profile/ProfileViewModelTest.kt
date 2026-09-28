@@ -1,5 +1,6 @@
 package com.warrior.feature.profile
 
+import com.warrior.domain.auth.AppPreferences
 import com.warrior.domain.auth.AuthRepository
 import com.warrior.domain.auth.DuplicateUsernameException
 import com.warrior.domain.auth.LocalAccount
@@ -53,6 +54,7 @@ class ProfileViewModelTest {
         updateAccount = UpdateAccount(repository),
         logout = Logout(session),
         backupRepository = backup,
+        appPreferences = FakeAppPreferences(),
     )
 
     @Test
@@ -269,5 +271,18 @@ private class FakeLocalSession : LocalSession {
 
     override suspend fun clear() {
         state.value = null
+    }
+}
+
+private class FakeAppPreferences : AppPreferences {
+    private val lang = MutableStateFlow(AppPreferences.LANG_SYSTEM)
+    private val cal = MutableStateFlow(AppPreferences.CALENDAR_GREGORIAN)
+    override val language: Flow<String> = lang
+    override val calendar: Flow<String> = cal
+    override suspend fun setLanguage(tag: String) {
+        lang.value = tag
+    }
+    override suspend fun setCalendar(id: String) {
+        cal.value = id
     }
 }

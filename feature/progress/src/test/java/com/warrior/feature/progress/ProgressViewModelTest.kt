@@ -1,5 +1,6 @@
 package com.warrior.feature.progress
 
+import com.warrior.domain.auth.AppPreferences
 import com.warrior.domain.auth.LocalSession
 import com.warrior.domain.auth.usecase.ObserveSession
 import com.warrior.domain.progress.ProgressCalculator
@@ -67,6 +68,7 @@ class ProgressViewModelTest {
             calculator = ProgressCalculator(WeekBoundaryProvider(TimeZone.getTimeZone("UTC"))),
             timeProvider = TimeProvider { now },
         ),
+        FakeAppPreferences(),
     )
 
     private fun workout(date: Long, type: WorkoutType, minutes: Long, focus: FocusArea, overall: Int) =
@@ -96,7 +98,6 @@ class ProgressViewModelTest {
         val state = buildViewModel().state.value
 
         assertTrue(state.loaded)
-        assertEquals("Sep 19 – Sep 25", state.weekRangeLabel)
 
         val snapshot = state.snapshot!!
         assertEquals(2, snapshot.thisWeek.sessionCount)
@@ -145,7 +146,6 @@ class ProgressViewModelTest {
         val state = buildViewModel().state.value
 
         assertTrue(state.loaded)
-        assertEquals("Sep 19 – Sep 25", state.weekRangeLabel)
         assertEquals(8, state.volumeFractions.size)
         assertTrue(state.volumeFractions.all { it == 0f })
         assertTrue(state.snapshot!!.workoutDistribution.isEmpty())
@@ -157,7 +157,6 @@ class ProgressViewModelTest {
         val state = buildViewModel().state.value
         assertTrue(state.loaded)
         assertNull(state.snapshot)
-        assertEquals("", state.weekRangeLabel)
         assertTrue(state.volumeFractions.isEmpty())
     }
 
@@ -219,5 +218,18 @@ internal class FakeTrainingRepository : TrainingRepository {
 
     private fun publish() {
         state.value = sessions.values.toList()
+    }
+}
+
+private class FakeAppPreferences : AppPreferences {
+    private val lang = MutableStateFlow(AppPreferences.LANG_SYSTEM)
+    private val cal = MutableStateFlow(AppPreferences.CALENDAR_GREGORIAN)
+    override val language: Flow<String> = lang
+    override val calendar: Flow<String> = cal
+    override suspend fun setLanguage(tag: String) {
+        lang.value = tag
+    }
+    override suspend fun setCalendar(id: String) {
+        cal.value = id
     }
 }

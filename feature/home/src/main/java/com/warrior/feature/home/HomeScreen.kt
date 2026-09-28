@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.warrior.core.common.time.DateFormats
+import com.warrior.core.common.time.DisplayCalendar
 import com.warrior.core.designsystem.components.DeltaText
 import com.warrior.core.designsystem.components.HeatmapMonth
 import com.warrior.core.designsystem.components.TrainingHeatmapGrid
@@ -48,6 +49,7 @@ import com.warrior.core.designsystem.components.WarriorEmptyState
 import com.warrior.core.designsystem.components.WarriorLoadingBox
 import com.warrior.core.designsystem.components.WarriorSectionHeader
 import com.warrior.core.designsystem.components.WarriorTopBar
+import com.warrior.core.designsystem.components.rememberUiLocale
 import com.warrior.core.designsystem.icons.WarriorIconPlus
 import com.warrior.core.designsystem.theme.Accent
 import com.warrior.core.designsystem.theme.Cardio
@@ -61,6 +63,7 @@ import com.warrior.domain.progress.model.HomeProgress
 import com.warrior.domain.training.model.TrainingSession
 import com.warrior.domain.training.model.WorkoutType
 import com.warrior.domain.training.model.rowTitle
+import java.util.Locale
 
 /**
  * Home dashboard (Phase 7) — live-derived numbers only, per ui-preview:
@@ -111,7 +114,7 @@ fun HomeScreen(
         when {
             progress != null -> HomeContent(
                 progress = progress,
-                weekRangeLabel = state.weekRangeLabel,
+                calendar = state.calendar,
                 onStartWorkout = onStartWorkout,
                 onOpenSession = onOpenSession,
             )
@@ -124,10 +127,17 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     progress: HomeProgress,
-    weekRangeLabel: String,
+    calendar: DisplayCalendar,
     onStartWorkout: () -> Unit,
     onOpenSession: (Long) -> Unit,
 ) {
+    val locale = rememberUiLocale()
+    val weekRangeLabel = DateFormats.weekRange(
+        progress.thisWeek.weekStart,
+        progress.thisWeek.weekEndExclusive,
+        calendar = calendar,
+        locale = locale,
+    )
     ThisWeekCard(progress, weekRangeLabel)
 
     Spacer(Modifier.height(16.dp))
@@ -137,7 +147,7 @@ private fun HomeContent(
         TrainingHeatmapGrid(
             months = progress.heatmap.months.map { month ->
                 HeatmapMonth(
-                    label = DateFormats.monthLabel(month.year, month.month),
+                    label = DateFormats.monthLabel(month.year, month.month, calendar, locale),
                     leadingBlanks = month.firstDayColumnOffset,
                     daysInMonth = month.daysInMonth,
                     trainedDays = month.trainedDays,
@@ -150,7 +160,7 @@ private fun HomeContent(
     Spacer(Modifier.height(16.dp))
     WarriorSectionHeader(stringResource(R.string.home_recent_title))
     Spacer(Modifier.height(8.dp))
-    RecentSessionsCard(progress.recentSessions, onOpenSession)
+    RecentSessionsCard(progress.recentSessions, calendar, locale, onOpenSession)
 
     Spacer(Modifier.height(16.dp))
     WarriorSectionHeader(stringResource(R.string.home_records_title))
@@ -237,7 +247,12 @@ private fun RowScope.MiniStat(value: String, label: String, delta: Int) {
 }
 
 @Composable
-private fun RecentSessionsCard(sessions: List<TrainingSession>, onOpenSession: (Long) -> Unit) {
+private fun RecentSessionsCard(
+    sessions: List<TrainingSession>,
+    calendar: DisplayCalendar,
+    locale: Locale,
+    onOpenSession: (Long) -> Unit,
+) {
     WarriorCard {
         if (sessions.isEmpty()) {
             WarriorEmptyState(
@@ -249,6 +264,8 @@ private fun RecentSessionsCard(sessions: List<TrainingSession>, onOpenSession: (
                 RecentRow(
                     session = session,
                     showDivider = index != sessions.lastIndex,
+                    calendar = calendar,
+                    locale = locale,
                     onClick = { onOpenSession(session.id) },
                 )
             }
@@ -257,7 +274,13 @@ private fun RecentSessionsCard(sessions: List<TrainingSession>, onOpenSession: (
 }
 
 @Composable
-private fun RecentRow(session: TrainingSession, showDivider: Boolean, onClick: () -> Unit) {
+private fun RecentRow(
+    session: TrainingSession,
+    showDivider: Boolean,
+    calendar: DisplayCalendar,
+    locale: Locale,
+    onClick: () -> Unit,
+) {
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -277,7 +300,7 @@ private fun RecentRow(session: TrainingSession, showDivider: Boolean, onClick: (
                 Text(
                     stringResource(
                         R.string.home_session_meta,
-                        DateFormats.short(session.date),
+                        DateFormats.short(session.date, calendar = calendar, locale = locale),
                         DateFormats.durationLabel(session.totalDuration.inWholeMinutes),
                         session.overallIntensity,
                     ),

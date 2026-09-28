@@ -28,11 +28,13 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.warrior.core.designsystem.theme.Accent
 import com.warrior.core.designsystem.theme.Outline
@@ -148,6 +150,7 @@ fun TrainingHeatmapGrid(
     val idleColor = Outline
     val trainedColor = TextPrimary
     val todayColor = Accent
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     BoxWithConstraints(modifier.fillMaxWidth()) {
         val monthGap = 12.dp
         val cellSize = ((maxWidth - monthGap * (months.size - 1)) / months.size / 7).coerceAtMost(16.dp)
@@ -163,9 +166,12 @@ fun TrainingHeatmapGrid(
             val gap = monthGap.toPx()
             val gridTop = labelHeight.toPx()
             val totalWidth = monthWidth * months.size + gap * (months.size - 1)
-            var blockLeft = (size.width - totalWidth) / 2f
+            val firstBlockLeft = (size.width - totalWidth) / 2f
             val dotRadius = (cell * 0.26f).coerceAtMost(4.dp.toPx())
-            months.forEach { month ->
+            // RTL (fa): months flow right-to-left and each week row starts at the right.
+            val orderedMonths = if (rtl) months.asReversed() else months
+            orderedMonths.forEachIndexed { monthIndex, month ->
+                val blockLeft = firstBlockLeft + monthIndex * (monthWidth + gap)
                 val labelLayout = textMeasurer.measure(
                     text = month.label,
                     style = labelStyle.copy(color = TextMuted, fontWeight = FontWeight.Bold),
@@ -177,8 +183,10 @@ fun TrainingHeatmapGrid(
                 for (cellIndex in 0 until month.leadingBlanks + month.daysInMonth) {
                     val day = cellIndex - month.leadingBlanks + 1
                     if (day < 1) continue
+                    val column = cellIndex % 7
+                    val visualColumn = if (rtl) 6 - column else column
                     val center = Offset(
-                        x = blockLeft + (cellIndex % 7 + 0.5f) * cell,
+                        x = blockLeft + (visualColumn + 0.5f) * cell,
                         y = gridTop + (cellIndex / 7 + 0.5f) * cell,
                     )
                     val color = when {
@@ -188,7 +196,6 @@ fun TrainingHeatmapGrid(
                     }
                     drawCircle(color = color, radius = dotRadius, center = center)
                 }
-                blockLeft += monthWidth + gap
             }
         }
     }

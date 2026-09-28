@@ -17,10 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.warrior.core.designsystem.theme.Accent
 import com.warrior.core.designsystem.theme.TextMuted
+import java.util.Locale
 
 /**
  * Shared screen-state building blocks (Phase 9 polish): every feature uses the
@@ -69,6 +71,10 @@ fun WarriorEmptyState(
         }
     }
 }
+
+/** The UI locale to format dates with (follows the app's display language). */
+@Composable
+fun rememberUiLocale(): Locale = LocalConfiguration.current.locales[0]
 
 /** Centered progress indicator for first-load states. */
 @Composable

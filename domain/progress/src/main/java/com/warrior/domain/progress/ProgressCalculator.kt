@@ -16,7 +16,7 @@ class ProgressCalculator @Inject constructor(
     private val weeks: WeekBoundaryProvider,
 ) {
 
-    fun homeProgress(sessions: List<TrainingSession>, nowMillis: Long): HomeProgress {
+    fun homeProgress(sessions: List<TrainingSession>, nowMillis: Long, jalali: Boolean = false): HomeProgress {
         val thisWeekStart = weeks.startOfWeek(nowMillis)
         val thisWeekEnd = weeks.startOfNextWeek(thisWeekStart)
         val lastWeekStart = weeks.startOfPreviousWeek(thisWeekStart)
@@ -26,7 +26,7 @@ class ProgressCalculator @Inject constructor(
             streakWeeks = ProgressEngine.streakWeeks(sessions, thisWeekStart, weeks),
             records = ProgressEngine.personalRecords(sessions),
             recentSessions = ProgressEngine.recentSessions(sessions, RECENT_LIMIT),
-            heatmap = ProgressEngine.monthsHeatmap(sessions, nowMillis, weeks.zone, HEATMAP_MONTHS),
+            heatmap = ProgressEngine.monthsHeatmap(sessions, nowMillis, weeks.zone, HEATMAP_MONTHS, jalali),
         )
     }
 

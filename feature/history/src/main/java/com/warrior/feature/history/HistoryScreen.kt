@@ -26,10 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.warrior.core.common.time.DateFormats
+import com.warrior.core.common.time.DisplayCalendar
 import com.warrior.core.designsystem.components.WarriorBadge
 import com.warrior.core.designsystem.components.WarriorCard
 import com.warrior.core.designsystem.components.WarriorEmptyState
 import com.warrior.core.designsystem.components.WarriorTopBar
+import com.warrior.core.designsystem.components.rememberUiLocale
 import com.warrior.core.designsystem.theme.Cardio
 import com.warrior.core.designsystem.theme.HeavyBag
 import com.warrior.core.designsystem.theme.MittWork
@@ -39,6 +41,7 @@ import com.warrior.domain.training.model.TrainingSession
 import com.warrior.domain.training.model.WorkoutType
 import com.warrior.domain.training.model.label
 import com.warrior.domain.training.model.rowTitle
+import java.util.Locale
 
 @Composable
 fun HistoryScreen(
@@ -69,7 +72,9 @@ fun HistoryScreen(
                                 group.key,
                                 todayLabel = stringResource(R.string.history_day_today),
                                 yesterdayLabel = stringResource(R.string.history_day_yesterday),
-                            ).uppercase(),
+                                calendar = state.calendar,
+                                locale = rememberUiLocale(),
+                            ).let { if (state.calendar == DisplayCalendar.GREGORIAN) it.uppercase() else it },
                             style = MaterialTheme.typography.labelSmall,
                             color = TextMuted,
                             modifier = Modifier.padding(top = 14.dp, bottom = 6.dp, start = 2.dp),
@@ -81,6 +86,8 @@ fun HistoryScreen(
                                 SessionRow(
                                     session = session,
                                     showDivider = index != group.sessions.lastIndex,
+                                    calendar = state.calendar,
+                                    locale = rememberUiLocale(),
                                     onClick = { onOpenSession(session.id) },
                                 )
                             }
@@ -94,7 +101,13 @@ fun HistoryScreen(
 }
 
 @Composable
-private fun SessionRow(session: TrainingSession, showDivider: Boolean, onClick: () -> Unit) {
+private fun SessionRow(
+    session: TrainingSession,
+    showDivider: Boolean,
+    calendar: DisplayCalendar,
+    locale: Locale,
+    onClick: () -> Unit,
+) {
     val first = session.activities.firstOrNull()
     Column {
         Row(
@@ -115,7 +128,7 @@ private fun SessionRow(session: TrainingSession, showDivider: Boolean, onClick: 
                 Text(
                     stringResource(
                         R.string.history_session_meta,
-                        DateFormats.short(session.date),
+                        DateFormats.short(session.date, calendar = calendar, locale = locale),
                         DateFormats.durationLabel(session.totalDuration.inWholeMinutes),
                         session.overallFeeling.label,
                     ),

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="workout_title_new">جلسهٔ جدید</string>
+    <string name="workout_title_edit">ویرایش جلسه</string>
+    <string name="workout_step_activities">فعالیت‌ها</string>
+    <string name="workout_step_review">مرور و ذخیره</string>
+    <string name="workout_badge_edit">ویرایش</string>
+
+    <string name="workout_label_date">تاریخ</string>
+    <string name="workout_value_today">امروز</string>
+    <string name="workout_overall_intensity">شدت کلی — %1$d/۱۰</string>
+    <string name="workout_label_feeling">احساس</string>
+    <string name="workout_field_notes">یادداشت</string>
+
+    <string name="workout_action_continue">ادامه ←</string>
+    <string name="workout_action_add_activity">+ افزودن فعالیت</string>
+    <string name="workout_action_save">ذخیرهٔ جلسه</string>
+    <string name="workout_action_saving">در حال ذخیره…</string>
+    <string name="workout_action_delete_session">حذف جلسه</string>
+
+    <string name="workout_delete_title">این جلسه حذف شود؟</string>
+    <string name="workout_delete_body">فعالیت‌ها و راندها نیز همراه آن حذف می‌شوند. این عمل قابل بازگشت نیست.</string>
+    <string name="workout_delete_confirm">حذف</string>
+    <string name="workout_cancel">انصراف</string>
+
+    <string name="workout_empty_activities_title">هنوز فعالیتی ندارید</string>
+    <string name="workout_empty_activities_body">بلوک‌های کیسهٔ سنگین، میت، اسپارینگ یا هوازی اضافه کنید.</string>
+    <string name="workout_label_duration">مدت</string>
+    <string name="workout_stepper_minutes">%1$d دقیقه</string>
+    <string name="workout_activity_intensity">شدت — %1$d/۱۰</string>
+    <string name="workout_label_focus">تمرکز</string>
+    <string name="workout_rounds_count">راندها — %1$d</string>
+    <string name="workout_add_round">+ راند</string>
+    <string name="workout_round_label">R%1$d</string>
+    <string name="workout_round_work">%1$d د کار</string>
+    <string name="workout_round_rest">%1$d د استراحت</string>
+    <string name="workout_remove_round_cd">حذف راند</string>
+    <string name="workout_remove_activity">✕ حذف فعالیت</string>
+
+    <string name="workout_review_date">تاریخ</string>
+    <string name="workout_review_activities">فعالیت‌ها</string>
+    <string name="workout_review_total_duration">مدت کل</string>
+    <string name="workout_review_rounds">راندها</string>
+    <string name="workout_review_intensity">شدت کلی</string>
+    <string name="workout_review_feeling">احساس</string>
+    <string name="workout_review_intensity_value">%1$d/۱۰</string>
+    <string name="workout_activity_title_with_rounds">%1$s · %2$d راند</string>
+    <string name="workout_review_activity_meta">%1$s · %2$d دقیقه · شدت %3$d</string>
+
+    <string name="workout_error_overall_intensity_range">شدت کلی باید بین ۱ تا ۱۰ باشد</string>
+    <string name="workout_error_no_activities">برای ذخیرهٔ جلسه حداقل یک فعالیت اضافه کنید</string>
+    <string name="workout_error_activity_duration">مدت هر فعالیت باید بیشتر از صفر باشد</string>
+    <string name="workout_error_activity_intensity">شدت فعالیت باید بین ۱ تا ۱۰ باشد</string>
+    <string name="workout_error_round_number">شمارهٔ راند باید مثبت باشد</string>
+    <string name="workout_error_round_duration">زمان کار راند باید بیشتر از صفر باشد</string>
+    <string name="workout_error_round_rest">استراحت راند نمی‌تواند منفی باشد</string>
+    <string name="workout_error_round_intensity">شدت راند باید بین ۱ تا ۱۰ باشد</string>
+    <string name="workout_error_session_not_found">این جلسه دیگر وجود ندارد</string>
+    <string name="workout_error_not_signed_in">از حساب خارج شده‌اید — دوباره وارد شوید</string>
+    <string name="workout_error_save_failed">ذخیرهٔ جلسه ناموفق بود — دوباره تلاش کنید</string>
+    <string name="workout_error_unexpected">خطای غیرمنتظره — دوباره تلاش کنید</string>
+</resources>

@@ -9,6 +9,15 @@
     <string name="profile_row_import">Import backup</string>
     <string name="profile_badge_offline">offline</string>
     <string name="profile_row_about">About · v%1$s</string>
+    <string name="profile_row_language">Language</string>
+    <string name="profile_row_calendar">Calendar</string>
+    <string name="profile_language_dialog_title">Display language</string>
+    <string name="profile_language_system">System default</string>
+    <string name="profile_language_en">English</string>
+    <string name="profile_language_fa">فارسی</string>
+    <string name="profile_calendar_dialog_title">Display calendar</string>
+    <string name="profile_calendar_gregorian">Gregorian</string>
+    <string name="profile_calendar_jalali">Jalali (Shamsi)</string>
 
     <string name="profile_privacy_body">All training data is stored only on this device (Room/SQLite). Password is stored as a PBKDF2 hash with a per-user salt — never in plain text.</string>
     <string name="profile_logout">Log Out</string>

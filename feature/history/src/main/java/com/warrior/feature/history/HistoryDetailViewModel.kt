@@ -3,6 +3,8 @@ package com.warrior.feature.history
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.warrior.core.common.time.DisplayCalendar
+import com.warrior.domain.auth.AppPreferences
 import com.warrior.domain.auth.usecase.ObserveSession
 import com.warrior.domain.training.model.TrainingSession
 import com.warrior.domain.training.usecase.DeleteTrainingSession
@@ -28,6 +30,7 @@ class HistoryDetailViewModel @Inject constructor(
     getTrainingHistory: GetTrainingHistory,
     private val observeSession: ObserveSession,
     private val deleteTrainingSession: DeleteTrainingSession,
+    appPreferences: AppPreferences,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -36,6 +39,7 @@ class HistoryDetailViewModel @Inject constructor(
         val loaded: Boolean = false,
         val showDeleteConfirm: Boolean = false,
         val isDeleted: Boolean = false,
+        val calendar: DisplayCalendar = DisplayCalendar.GREGORIAN,
     )
 
     private val sessionId: Long = savedStateHandle.get<Long>("sessionId") ?: 0L
@@ -44,6 +48,19 @@ class HistoryDetailViewModel @Inject constructor(
     val state: StateFlow<UiState> = _state.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            appPreferences.calendar.collect { cal ->
+                _state.update {
+                    it.copy(
+                        calendar = if (cal == AppPreferences.CALENDAR_JALALI) {
+                            DisplayCalendar.JALALI
+                        } else {
+                            DisplayCalendar.GREGORIAN
+                        },
+                    )
+                }
+            }
+        }
         viewModelScope.launch {
             observeSession()
                 .flatMapLatest { userId ->

@@ -63,6 +63,70 @@ class DateFormatsTest {
         )
     }
 
+    @Test
+    fun jalaliDayHeader_weekRangeAndShort_faLocale() {
+        val fa = java.util.Locale("fa")
+        val now = localMillis(utc, 2026, 9, 27) + 12 * 3_600_000L // Sun 2026-09-27 12:00 UTC = 1405/7/5
+
+        // A previous day: 2026-09-20 (Sunday) = 1405/6/29 -> full Jalali label with Persian digits.
+        val header = DateFormats.dayHeader(
+            localMillis(utc, 2026, 9, 20),
+            now,
+            utc,
+            todayLabel = "امروز",
+            yesterdayLabel = "دیروز",
+            calendar = DisplayCalendar.JALALI,
+            locale = fa,
+        )
+        assertEquals("یکشنبه ۲۹ شهریور ۱۴۰۵", header)
+
+        // Today/yesterday still resolve through the passed labels.
+        assertEquals(
+            "امروز",
+            DateFormats.dayHeader(
+                localMillis(utc, 2026, 9, 27),
+                now,
+                utc,
+                todayLabel = "امروز",
+                yesterdayLabel = "دیروز",
+                calendar = DisplayCalendar.JALALI,
+                locale = fa,
+            ),
+        )
+
+        // Jalali week range: Sat 2026-09-26 (1405/7/4) .. Fri 2026-10-02 (1405/7/10).
+        assertEquals(
+            "۴ مهر – ۱۰ مهر",
+            DateFormats.weekRange(
+                localMillis(utc, 2026, 9, 26),
+                localMillis(utc, 2026, 10, 3),
+                utc,
+                calendar = DisplayCalendar.JALALI,
+                locale = fa,
+            ),
+        )
+
+        // Compact Jalali day: Thu 2026-09-24 = 1405/7/2 -> "پ ۲ مهر".
+        assertEquals(
+            "پ ۲ مهر",
+            DateFormats.short(
+                localMillis(utc, 2026, 9, 24),
+                utc,
+                calendar = DisplayCalendar.JALALI,
+                locale = fa,
+            ),
+        )
+
+        // Jalali month label for the heatmap.
+        assertEquals("مهر", DateFormats.monthLabel(1405, 7, calendar = DisplayCalendar.JALALI))
+
+        // Gregorian path stays byte-identical to v1 behavior.
+        assertEquals(
+            "Sep 19 – Sep 25",
+            DateFormats.weekRange(localMillis(utc, 2026, 9, 19), localMillis(utc, 2026, 9, 26), utc),
+        )
+    }
+
     private fun utcMillis(year: Int, month: Int, day: Int): Long = localMillis(utc, year, month, day)
 
     private fun localMillis(zone: TimeZone, year: Int, month: Int, day: Int): Long =

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.warrior.core.common.time.DateFormats
+import com.warrior.core.common.time.DisplayCalendar
 import com.warrior.core.designsystem.components.ChartBar
 import com.warrior.core.designsystem.components.DeltaText
 import com.warrior.core.designsystem.components.DistributionBarRow
@@ -30,6 +31,7 @@ import com.warrior.core.designsystem.components.WarriorEmptyState
 import com.warrior.core.designsystem.components.WarriorLoadingBox
 import com.warrior.core.designsystem.components.WarriorSectionHeader
 import com.warrior.core.designsystem.components.WarriorTopBar
+import com.warrior.core.designsystem.components.rememberUiLocale
 import com.warrior.core.designsystem.theme.Cardio
 import com.warrior.core.designsystem.theme.HeavyBag
 import com.warrior.core.designsystem.theme.MittWork
@@ -63,7 +65,7 @@ fun ProgressScreen(
 
         val snapshot = state.snapshot
         when {
-            snapshot != null -> ProgressContent(snapshot, state.weekRangeLabel, state.volumeFractions)
+            snapshot != null -> ProgressContent(snapshot, state.calendar, state.volumeFractions)
             !state.loaded -> WarriorLoadingBox()
             // Loaded with a null snapshot = signed out; root nav swaps to Auth.
         }
@@ -73,12 +75,19 @@ fun ProgressScreen(
 @Composable
 private fun ProgressContent(
     snapshot: ProgressSnapshot,
-    weekRangeLabel: String,
+    calendar: DisplayCalendar,
     volumeFractions: List<Float>,
 ) {
     val thisWeek = snapshot.thisWeek
     val lastWeek = snapshot.lastWeek
     val hasData = snapshot.volumeSeries.any { it.trainingMinutes > 0 }
+    val locale = rememberUiLocale()
+    val weekRangeLabel = DateFormats.weekRange(
+        thisWeek.weekStart,
+        thisWeek.weekEndExclusive,
+        calendar = calendar,
+        locale = locale,
+    )
 
     WarriorCard {
         Text(

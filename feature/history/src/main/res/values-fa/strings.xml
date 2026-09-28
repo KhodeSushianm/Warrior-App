@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_title">تاریخچه</string>
+    <string name="history_empty_title">هنوز جلسه‌ای ندارید</string>
+    <string name="history_empty_body">تمرین‌های ثبت‌شده بر اساس روز و با هفته‌های شنبه تا جمعه گروه‌بندی می‌شوند.</string>
+    <string name="history_cta_log">+ ثبت تمرین</string>
+    <string name="history_day_today">امروز</string>
+    <string name="history_day_yesterday">دیروز</string>
+    <string name="history_session_meta">%1$s · %2$s · حس %3$s</string>
+    <string name="history_intensity_badge">شدت %1$d</string>
+
+    <string name="history_detail_title">جزئیات جلسه</string>
+    <string name="history_detail_not_found">جلسه پیدا نشد</string>
+    <string name="history_detail_header_meta">%1$s · %2$s · شدت %3$d/۱۰ · حس %4$s</string>
+    <string name="history_detail_activity_meta">%1$s · %2$s · شدت %3$d/۱۰</string>
+    <string name="history_detail_round_line">R%1$d · کار %2$d:۰۰ / استراحت %3$d:۰۰ · شدت %4$d</string>
+
+    <string name="history_action_edit">ویرایش جلسه</string>
+    <string name="history_action_delete">حذف جلسه</string>
+    <string name="history_delete_title">این جلسه حذف شود؟</string>
+    <string name="history_delete_body">فعالیت‌ها و راندها نیز همراه آن حذف می‌شوند. این عمل قابل بازگشت نیست.</string>
+    <string name="history_delete_confirm">حذف</string>
+    <string name="history_cancel">انصراف</string>
+
+    <plurals name="history_rounds_count">
+        <item quantity="one">%d راند</item>
+        <item quantity="other">%d راند</item>
+    </plurals>
+</resources>

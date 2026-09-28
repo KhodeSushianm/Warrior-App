@@ -1,6 +1,7 @@
 package com.warrior.feature.history
 
 import androidx.lifecycle.SavedStateHandle
+import com.warrior.domain.auth.AppPreferences
 import com.warrior.domain.auth.LocalSession
 import com.warrior.domain.auth.usecase.ObserveSession
 import com.warrior.domain.training.TrainingRepository
@@ -69,7 +70,7 @@ class HistoryViewModelTest {
         create(1, sessionAt(date = 300, createdAt = 3))
         create(1, sessionAt(date = 300, createdAt = 4))
 
-        val vm = HistoryViewModel(GetTrainingHistory(repository), ObserveSession(session), DeleteTrainingSession(repository))
+        val vm = HistoryViewModel(GetTrainingHistory(repository), ObserveSession(session), DeleteTrainingSession(repository), FakeAppPreferences())
         val groups = vm.state.value.groups
         assertEquals(listOf(300L, 100L), groups.map { it.key })
         assertEquals(2, groups[0].sessions.size)
@@ -81,7 +82,7 @@ class HistoryViewModelTest {
         session.start(1)
         val id = CreateTrainingSession(repository)(1, sessionAt(100)).getOrThrow()
 
-        val vm = HistoryViewModel(GetTrainingHistory(repository), ObserveSession(session), DeleteTrainingSession(repository))
+        val vm = HistoryViewModel(GetTrainingHistory(repository), ObserveSession(session), DeleteTrainingSession(repository), FakeAppPreferences())
         assertEquals(1, vm.state.value.groups.size)
 
         vm.onDeleteRequest(id)
@@ -100,6 +101,7 @@ class HistoryViewModelTest {
             GetTrainingHistory(repository),
             ObserveSession(session),
             DeleteTrainingSession(repository),
+            FakeAppPreferences(),
             SavedStateHandle(mapOf("sessionId" to id)),
         )
         assertEquals(id, detail.state.value.session?.id)
@@ -164,5 +166,18 @@ internal class FakeTrainingRepository : TrainingRepository {
 
     private fun publish() {
         state.value = sessions.values.toList()
+    }
+}
+
+private class FakeAppPreferences : AppPreferences {
+    private val lang = MutableStateFlow(AppPreferences.LANG_SYSTEM)
+    private val cal = MutableStateFlow(AppPreferences.CALENDAR_GREGORIAN)
+    override val language: Flow<String> = lang
+    override val calendar: Flow<String> = cal
+    override suspend fun setLanguage(tag: String) {
+        lang.value = tag
+    }
+    override suspend fun setCalendar(id: String) {
+        cal.value = id
     }
 }

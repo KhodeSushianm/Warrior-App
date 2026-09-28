@@ -1,5 +1,6 @@
 package com.warrior.feature.home
 
+import com.warrior.domain.auth.AppPreferences
 import com.warrior.domain.auth.LocalSession
 import com.warrior.domain.auth.usecase.ObserveSession
 import com.warrior.domain.progress.ProgressCalculator
@@ -68,6 +69,7 @@ class HomeViewModelTest {
             calculator = ProgressCalculator(WeekBoundaryProvider(TimeZone.getTimeZone("UTC"))),
             timeProvider = TimeProvider { now },
         ),
+        FakeAppPreferences(),
     )
 
     private fun heavyBagSession(date: Long, minutes: Long, rounds: Int, overall: Int) = TrainingSession(
@@ -103,7 +105,6 @@ class HomeViewModelTest {
         val state = buildViewModel().state.value
 
         assertTrue(state.loaded)
-        assertEquals("Sep 19 – Sep 25", state.weekRangeLabel)
         val progress = state.progress!!
         assertEquals(2, progress.thisWeek.sessionCount)
         assertEquals(90L, progress.thisWeek.trainingMinutes)
@@ -137,7 +138,6 @@ class HomeViewModelTest {
         val state = buildViewModel().state.value
 
         assertTrue(state.loaded)
-        assertEquals("Sep 19 – Sep 25", state.weekRangeLabel)
         assertEquals(0, state.progress?.thisWeek?.sessionCount)
         assertTrue(state.progress!!.records.isEmpty)
         assertEquals(0, state.progress!!.streakWeeks)
@@ -149,7 +149,6 @@ class HomeViewModelTest {
         val state = buildViewModel().state.value
         assertTrue(state.loaded)
         assertNull(state.progress)
-        assertEquals("", state.weekRangeLabel)
     }
 
     private fun utcMillis(year: Int, month: Int, day: Int, hour: Int = 0): Long =
@@ -210,5 +209,18 @@ internal class FakeTrainingRepository : TrainingRepository {
 
     private fun publish() {
         state.value = sessions.values.toList()
+    }
+}
+
+private class FakeAppPreferences : AppPreferences {
+    private val lang = MutableStateFlow(AppPreferences.LANG_SYSTEM)
+    private val cal = MutableStateFlow(AppPreferences.CALENDAR_GREGORIAN)
+    override val language: Flow<String> = lang
+    override val calendar: Flow<String> = cal
+    override suspend fun setLanguage(tag: String) {
+        lang.value = tag
+    }
+    override suspend fun setCalendar(id: String) {
+        cal.value = id
     }
 }
