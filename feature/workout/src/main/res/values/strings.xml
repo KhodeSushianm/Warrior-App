@@ -60,4 +60,26 @@
     <string name="workout_error_not_signed_in">You are signed out — please log in again</string>
     <string name="workout_error_save_failed">Could not save the session — please try again</string>
     <string name="workout_error_unexpected">Unexpected error — please try again</string>
+    <!-- Live round timer (Season 2 / Phase 14) -->
+    <string name="timer_title">Round Timer</string>
+    <string name="timer_config_work">Work</string>
+    <string name="timer_config_rest">Rest</string>
+    <string name="timer_config_rounds">Rounds</string>
+    <string name="timer_seconds">%1$ds</string>
+    <string name="timer_type_header">WORKOUT TYPE</string>
+    <string name="timer_focus_header">FOCUS</string>
+    <string name="timer_start">Start</string>
+    <string name="timer_work">WORK</string>
+    <string name="timer_rest">REST</string>
+    <string name="timer_round_label">ROUND %1$d/%2$d</string>
+    <string name="timer_pause">Pause</string>
+    <string name="timer_resume">Resume</string>
+    <string name="timer_skip">Skip</string>
+    <string name="timer_end">End Workout</string>
+    <string name="timer_finished_title">Workout complete!</string>
+    <string name="timer_summary_rounds">%1$d rounds</string>
+    <string name="timer_summary_time">%1$s total</string>
+    <string name="timer_save">Save Session</string>
+    <string name="timer_discard">Discard</string>
+    <string name="timer_save_failed">Could not save the session — please try again</string>
 </resources>

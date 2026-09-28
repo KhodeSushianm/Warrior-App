@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:designsystem"))
     implementation(project(":domain:training"))
+    implementation(project(":domain:progress"))
     implementation(project(":domain:auth"))
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.hilt.android)

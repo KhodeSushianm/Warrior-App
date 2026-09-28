@@ -59,4 +59,25 @@
     <string name="workout_error_not_signed_in">از حساب خارج شده‌اید — دوباره وارد شوید</string>
     <string name="workout_error_save_failed">ذخیرهٔ جلسه ناموفق بود — دوباره تلاش کنید</string>
     <string name="workout_error_unexpected">خطای غیرمنتظره — دوباره تلاش کنید</string>
+    <string name="timer_title">تایمر راند</string>
+    <string name="timer_config_work">کار</string>
+    <string name="timer_config_rest">استراحت</string>
+    <string name="timer_config_rounds">راندها</string>
+    <string name="timer_seconds">%1$d ثانیه</string>
+    <string name="timer_type_header">نوع تمرین</string>
+    <string name="timer_focus_header">تمرکز</string>
+    <string name="timer_start">شروع</string>
+    <string name="timer_work">کار</string>
+    <string name="timer_rest">استراحت</string>
+    <string name="timer_round_label">راند %1$d/%2$d</string>
+    <string name="timer_pause">توقف</string>
+    <string name="timer_resume">ادامه</string>
+    <string name="timer_skip">رد شدن</string>
+    <string name="timer_end">پایان تمرین</string>
+    <string name="timer_finished_title">تمرین تمام شد!</string>
+    <string name="timer_summary_rounds">%1$d راند</string>
+    <string name="timer_summary_time">مجموع %1$s</string>
+    <string name="timer_save">ذخیرهٔ جلسه</string>
+    <string name="timer_discard">دور انداختن</string>
+    <string name="timer_save_failed">ذخیرهٔ جلسه ناموفق بود — دوباره تلاش کنید</string>
 </resources>

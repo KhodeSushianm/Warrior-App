@@ -22,6 +22,7 @@
     <string name="home_record_streak">Current streak</string>
 
     <string name="home_cta_log_workout">+ Log Workout</string>
+    <string name="home_cta_timer">Round Timer</string>
     <string name="home_delta_unit_minutes">m</string>
 
     <plurals name="home_streak_weeks">

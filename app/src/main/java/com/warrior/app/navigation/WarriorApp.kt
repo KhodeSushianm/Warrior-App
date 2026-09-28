@@ -44,6 +44,7 @@ import com.warrior.feature.home.HomeScreen
 import com.warrior.feature.profile.BodyScreen
 import com.warrior.feature.profile.ProfileScreen
 import com.warrior.feature.progress.ProgressScreen
+import com.warrior.feature.workout.LiveTimerScreen
 import com.warrior.feature.workout.WorkoutLoggingScreen
 
 private val MAIN_ROUTES = setOf("HomeRoute", "HistoryRoute", "ProgressRoute", "ProfileRoute")
@@ -127,6 +128,7 @@ private fun MainScreen() {
                 HomeScreen(
                     onStartWorkout = { navController.navigate(WorkoutRoute()) },
                     onOpenSession = { id -> navController.navigate(HistoryDetailRoute(id)) },
+                    onOpenTimer = { navController.navigate(LiveTimerRoute) },
                 )
             }
             composable<HistoryRoute> {
@@ -151,6 +153,9 @@ private fun MainScreen() {
             }
             composable<BodyRoute> {
                 BodyScreen(onBack = { navController.popBackStack() })
+            }
+            composable<LiveTimerRoute> {
+                LiveTimerScreen(onBack = { navController.popBackStack() })
             }
             composable<WorkoutRoute> { entry ->
                 val route = entry.toRoute<WorkoutRoute>()

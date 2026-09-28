@@ -22,6 +22,7 @@
     <string name="home_record_streak">هفته‌های پیوسته</string>
 
     <string name="home_cta_log_workout">+ ثبت تمرین</string>
+    <string name="home_cta_timer">تایمر راند</string>
     <string name="home_delta_unit_minutes">د</string>
 
     <plurals name="home_streak_weeks">

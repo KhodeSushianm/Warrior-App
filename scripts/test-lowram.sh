@@ -46,4 +46,5 @@ java -Xmx850m -XX:MaxMetaspaceSize=256m -Dfile.encoding=UTF-8 \
     com.warrior.data.local.SessionMapperTest \
     com.warrior.data.local.AuthRepositoryTest \
     com.warrior.data.local.MigrationTest \
+    com.warrior.data.local.BackupRepositoryTest \
     "$@"

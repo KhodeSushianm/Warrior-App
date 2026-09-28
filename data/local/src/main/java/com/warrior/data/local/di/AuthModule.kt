@@ -6,6 +6,7 @@ import com.warrior.data.local.settings.DataStoreAppPreferences
 import com.warrior.domain.auth.AppPreferences
 import com.warrior.domain.auth.AuthRepository
 import com.warrior.domain.auth.LocalSession
+import com.warrior.domain.training.TimerPreferences
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -23,6 +24,10 @@ abstract class AuthModule {
     @Binds
     @Singleton
     abstract fun bindAppPreferences(impl: DataStoreAppPreferences): AppPreferences
+
+    @Binds
+    @Singleton
+    abstract fun bindTimerPreferences(impl: DataStoreAppPreferences): TimerPreferences
 
     @Binds
     @Singleton

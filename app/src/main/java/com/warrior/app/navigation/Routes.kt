@@ -26,3 +26,7 @@ data class WorkoutRoute(val sessionId: Long? = null)
 /** Athlete body metrics + 3D profile (Season 2 / Phase 12). */
 @Serializable
 data object BodyRoute
+
+/** Live round timer (Season 2 / Phase 14). */
+@Serializable
+data object LiveTimerRoute

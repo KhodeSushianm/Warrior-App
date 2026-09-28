@@ -44,6 +44,7 @@ import com.warrior.core.designsystem.components.DeltaText
 import com.warrior.core.designsystem.components.HeatmapMonth
 import com.warrior.core.designsystem.components.TrainingHeatmapGrid
 import com.warrior.core.designsystem.components.WarriorButton
+import com.warrior.core.designsystem.components.WarriorButtonVariant
 import com.warrior.core.designsystem.components.WarriorCard
 import com.warrior.core.designsystem.components.WarriorEmptyState
 import com.warrior.core.designsystem.components.WarriorLoadingBox
@@ -75,6 +76,7 @@ import java.util.Locale
 fun HomeScreen(
     onStartWorkout: () -> Unit,
     onOpenSession: (Long) -> Unit,
+    onOpenTimer: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -117,6 +119,7 @@ fun HomeScreen(
                 calendar = state.calendar,
                 onStartWorkout = onStartWorkout,
                 onOpenSession = onOpenSession,
+                onOpenTimer = onOpenTimer,
             )
             !state.loaded -> WarriorLoadingBox()
             // Loaded with a null snapshot = signed out; root nav swaps to Auth.
@@ -130,6 +133,7 @@ private fun HomeContent(
     calendar: DisplayCalendar,
     onStartWorkout: () -> Unit,
     onOpenSession: (Long) -> Unit,
+    onOpenTimer: () -> Unit,
 ) {
     val locale = rememberUiLocale()
     val weekRangeLabel = DateFormats.weekRange(
@@ -169,6 +173,12 @@ private fun HomeContent(
 
     Spacer(Modifier.height(16.dp))
     WarriorButton(text = stringResource(R.string.home_cta_log_workout), onClick = onStartWorkout)
+    Spacer(Modifier.height(10.dp))
+    WarriorButton(
+        text = stringResource(R.string.home_cta_timer),
+        onClick = onOpenTimer,
+        variant = WarriorButtonVariant.GHOST,
+    )
     Spacer(Modifier.height(8.dp))
 }
 
