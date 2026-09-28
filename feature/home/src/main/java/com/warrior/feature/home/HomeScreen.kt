@@ -26,9 +26,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.warrior.core.common.time.DateFormats
@@ -42,6 +49,7 @@ import com.warrior.core.designsystem.components.WarriorLoadingBox
 import com.warrior.core.designsystem.components.WarriorSectionHeader
 import com.warrior.core.designsystem.components.WarriorTopBar
 import com.warrior.core.designsystem.icons.WarriorIconPlus
+import com.warrior.core.designsystem.theme.Accent
 import com.warrior.core.designsystem.theme.Cardio
 import com.warrior.core.designsystem.theme.HeavyBag
 import com.warrior.core.designsystem.theme.MittWork
@@ -77,6 +85,17 @@ fun HomeScreen(
     ) {
         WarriorTopBar(
             title = stringResource(R.string.home_wordmark),
+            titleContent = {
+                val wordmark = stringResource(R.string.home_wordmark)
+                val splitAt = (wordmark.length + 1) / 2
+                Text(
+                    buildAnnotatedString {
+                        withStyle(SpanStyle(color = TextPrimary)) { append(wordmark.take(splitAt)) }
+                        withStyle(SpanStyle(color = Accent)) { append(wordmark.drop(splitAt)) }
+                    },
+                    style = MaterialTheme.typography.headlineMedium,
+                )
+            },
             actions = {
                 IconButton(onClick = onStartWorkout) {
                     Icon(
@@ -147,7 +166,11 @@ private fun HomeContent(
 private fun ThisWeekCard(progress: HomeProgress, weekRangeLabel: String) {
     val thisWeek = progress.thisWeek
     val lastWeek = progress.lastWeek
-    WarriorCard {
+    WarriorCard(
+        brush = Brush.linearGradient(
+            listOf(Color(0x29FF4D4D), Color(0x00FF4D4D)),
+        ),
+    ) {
         Text(
             if (weekRangeLabel.isEmpty()) {
                 stringResource(R.string.home_this_week)
@@ -200,9 +223,15 @@ private fun ThisWeekCard(progress: HomeProgress, weekRangeLabel: String) {
 
 @Composable
 private fun RowScope.MiniStat(value: String, label: String, delta: Int) {
-    WarriorCard(modifier = Modifier.weight(1f)) {
-        Text(value, style = MaterialTheme.typography.titleLarge)
-        Text(label, style = MaterialTheme.typography.labelSmall, color = TextMuted)
+    WarriorCard(modifier = Modifier.weight(1f), contentPadding = 12.dp) {
+        Text(value, style = MaterialTheme.typography.titleLarge, maxLines = 1)
+        Text(
+            label,
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp, letterSpacing = 0.4.sp),
+            color = TextMuted,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
         DeltaText(delta = delta)
     }
 }
@@ -244,7 +273,7 @@ private fun RecentRow(session: TrainingSession, showDivider: Boolean, onClick: (
             )
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
-                Text(session.rowTitle, style = MaterialTheme.typography.titleMedium)
+                Text(session.rowTitle, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(
                     stringResource(
                         R.string.home_session_meta,
@@ -254,6 +283,8 @@ private fun RecentRow(session: TrainingSession, showDivider: Boolean, onClick: (
                     ),
                     style = MaterialTheme.typography.labelSmall,
                     color = TextMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }

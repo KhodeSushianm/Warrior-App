@@ -223,7 +223,7 @@ fun DistributionBarRow(
             fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.width(96.dp),
+            modifier = Modifier.width(100.dp),
         )
         Spacer(Modifier.width(10.dp))
         Canvas(

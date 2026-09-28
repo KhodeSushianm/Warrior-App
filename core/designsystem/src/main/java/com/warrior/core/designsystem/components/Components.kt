@@ -1,7 +1,11 @@
 package com.warrior.core.designsystem.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -20,9 +24,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.warrior.core.designsystem.theme.Accent
 import com.warrior.core.designsystem.theme.AccentSoft
@@ -34,18 +41,38 @@ import com.warrior.core.designsystem.theme.SurfaceVariant
 import com.warrior.core.designsystem.theme.TextMuted
 import com.warrior.core.designsystem.theme.TextPrimary
 
+/**
+ * App card. [contentPadding] lets dense cards (mini stats) breathe less;
+ * [brush] layers a subtle glow over the Surface base (Phase 11 polish —
+ * used by the Home hero card).
+ */
 @Composable
 fun WarriorCard(
     modifier: Modifier = Modifier,
+    contentPadding: Dp = 16.dp,
+    brush: Brush? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(20.dp),
-        color = Surface,
-        border = BorderStroke(1.dp, Outline),
-    ) {
-        Column(Modifier.padding(16.dp), content = content)
+    val shape = RoundedCornerShape(20.dp)
+    if (brush == null) {
+        Surface(
+            modifier = modifier,
+            shape = shape,
+            color = Surface,
+            border = BorderStroke(1.dp, Outline),
+        ) {
+            Column(Modifier.padding(contentPadding), content = content)
+        }
+    } else {
+        Box(
+            modifier
+                .clip(shape)
+                .background(Surface)
+                .background(brush)
+                .border(BorderStroke(1.dp, Outline), shape),
+        ) {
+            Column(Modifier.padding(contentPadding), content = content)
+        }
     }
 }
 
@@ -59,6 +86,32 @@ fun WarriorButton(
     variant: WarriorButtonVariant = WarriorButtonVariant.PRIMARY,
     enabled: Boolean = true,
 ) {
+    if (variant == WarriorButtonVariant.PRIMARY) {
+        // Phase 11 polish: gradient CTA (Accent -> deep red), ripple bounded by shape.
+        val shape = RoundedCornerShape(16.dp)
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(52.dp)
+                .clip(shape)
+                .background(
+                    if (enabled) {
+                        Brush.linearGradient(listOf(Accent, Color(0xFFD92E2E)))
+                    } else {
+                        Brush.linearGradient(listOf(Outline, Outline))
+                    },
+                )
+                .clickable(onClick = onClick, enabled = enabled),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text,
+                style = MaterialTheme.typography.titleMedium,
+                color = if (enabled) Color.White else TextMuted,
+            )
+        }
+        return
+    }
     val colors = when (variant) {
         WarriorButtonVariant.PRIMARY -> ButtonDefaults.buttonColors(
             containerColor = Accent,
@@ -130,6 +183,7 @@ fun WarriorTopBar(
     title: String,
     modifier: Modifier = Modifier,
     navigationIcon: (@Composable () -> Unit)? = null,
+    titleContent: (@Composable () -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     Row(
@@ -140,11 +194,15 @@ fun WarriorTopBar(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         navigationIcon?.invoke()
-        Text(
-            title,
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.weight(1f),
-        )
+        if (titleContent != null) {
+            Box(Modifier.weight(1f)) { titleContent() }
+        } else {
+            Text(
+                title,
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.weight(1f),
+            )
+        }
         actions()
     }
 }
@@ -166,7 +224,8 @@ fun WarriorChip(
         Text(
             label,
             style = MaterialTheme.typography.labelLarge,
-            color = if (selected) TextPrimary else TextMuted,
+            color = if (selected) Accent else TextMuted,
+            maxLines = 1,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
         )
     }
@@ -201,8 +260,8 @@ fun DeltaText(
 ) {
     val text = when {
         delta == 0 -> "±0"
-        delta > 0 -> "+$delta$unit"
-        else -> "$delta$unit"
+        delta > 0 -> "▲ $delta$unit"
+        else -> "▼ ${-delta}$unit"
     }
     val color = when {
         delta > 0 -> Positive

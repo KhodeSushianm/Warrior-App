@@ -1,17 +1,26 @@
+@file:OptIn(ExperimentalLayoutApi::class)
+
 package com.warrior.feature.workout
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +31,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,7 +47,9 @@ import com.warrior.core.designsystem.components.WarriorChip
 import com.warrior.core.designsystem.components.WarriorTextField
 import com.warrior.core.designsystem.components.WarriorTopBar
 import com.warrior.core.designsystem.theme.Negative
+import com.warrior.core.designsystem.theme.SurfaceVariant
 import com.warrior.core.designsystem.theme.TextMuted
+import com.warrior.core.designsystem.theme.TextPrimary
 import com.warrior.domain.training.model.Feeling
 import com.warrior.domain.training.model.FocusArea
 import com.warrior.domain.training.model.WorkoutType
@@ -226,7 +240,11 @@ private fun SessionStep(state: WorkoutLoggingViewModel.UiState, viewModel: Worko
         )
         Text(stringResource(R.string.workout_label_feeling), style = MaterialTheme.typography.labelSmall, color = TextMuted)
         Spacer(Modifier.height(6.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
             Feeling.entries.forEach { feeling ->
                 WarriorChip(
                     label = feeling.label,
@@ -259,7 +277,11 @@ private fun ActivitiesStep(state: WorkoutLoggingViewModel.UiState, viewModel: Wo
     }
     state.activities.forEachIndexed { index, activity ->
         WarriorCard {
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
                 WorkoutType.entries.forEach { type ->
                     WarriorChip(
                         label = type.label,
@@ -296,7 +318,11 @@ private fun ActivitiesStep(state: WorkoutLoggingViewModel.UiState, viewModel: Wo
             )
             Text(stringResource(R.string.workout_label_focus), style = MaterialTheme.typography.labelSmall, color = TextMuted)
             Spacer(Modifier.height(6.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
                 FocusArea.entries.forEach { focus ->
                     WarriorChip(
                         label = focus.label,
@@ -321,30 +347,38 @@ private fun ActivitiesStep(state: WorkoutLoggingViewModel.UiState, viewModel: Wo
                 activity.rounds.forEachIndexed { roundIndex, round ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 4.dp),
+                        modifier = Modifier
+                            .padding(top = 6.dp)
+                            .horizontalScroll(rememberScrollState()),
                     ) {
                         Text(
                             stringResource(R.string.workout_round_label, round.roundNumber),
                             style = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier.width(30.dp),
+                            modifier = Modifier.width(28.dp),
                         )
                         Stepper(
                             label = stringResource(R.string.workout_round_work, round.duration.inWholeMinutes.toInt()),
                             onMinus = { viewModel.onRoundWorkChange(index, roundIndex, -1) },
                             onPlus = { viewModel.onRoundWorkChange(index, roundIndex, 1) },
+                            valueWidth = 52.dp,
                         )
                         Spacer(Modifier.width(8.dp))
                         Stepper(
                             label = stringResource(R.string.workout_round_rest, round.restDuration.inWholeMinutes.toInt()),
                             onMinus = { viewModel.onRoundRestChange(index, roundIndex, -1) },
                             onPlus = { viewModel.onRoundRestChange(index, roundIndex, 1) },
+                            valueWidth = 52.dp,
                         )
-                        Spacer(Modifier.weight(1f))
-                        Text(
-                            "✕",
-                            color = TextMuted,
-                            modifier = Modifier.clickable { viewModel.onRemoveRound(index, roundIndex) },
-                        )
+                        Spacer(Modifier.width(8.dp))
+                        Box(
+                            Modifier
+                                .size(28.dp)
+                                .clip(CircleShape)
+                                .clickable { viewModel.onRemoveRound(index, roundIndex) },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text("✕", color = TextMuted, style = MaterialTheme.typography.labelLarge)
+                        }
                     }
                 }
             }
@@ -417,10 +451,35 @@ private fun KeyValue(key: String, value: String) {
 }
 
 @Composable
-private fun Stepper(label: String, onMinus: () -> Unit, onPlus: () -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        TextButton(onClick = onMinus) { Text("−") }
-        Text(label, style = MaterialTheme.typography.labelLarge, modifier = Modifier.width(64.dp))
-        TextButton(onClick = onPlus) { Text("+") }
+private fun Stepper(
+    label: String,
+    onMinus: () -> Unit,
+    onPlus: () -> Unit,
+    valueWidth: Dp = 56.dp,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        StepperButton("−", onMinus)
+        Text(
+            label,
+            style = MaterialTheme.typography.labelSmall,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            modifier = Modifier.width(valueWidth),
+        )
+        StepperButton("+", onPlus)
+    }
+}
+
+@Composable
+private fun StepperButton(symbol: String, onClick: () -> Unit) {
+    Box(
+        Modifier
+            .size(30.dp)
+            .clip(CircleShape)
+            .background(SurfaceVariant)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(symbol, style = MaterialTheme.typography.titleMedium, color = TextPrimary)
     }
 }

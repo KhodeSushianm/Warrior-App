@@ -29,8 +29,10 @@ cd "$(dirname "$0")/.."
 
 export JAVA_HOME=${JAVA_HOME:-/usr/lib/jvm/java-17-openjdk-amd64}
 export ANDROID_HOME=${ANDROID_HOME:-/opt/android-sdk}
-GRADLE_MEM="-Dorg.gradle.jvmargs=-Xmx384m\ -XX:MaxMetaspaceSize=256m\ -XX:ReservedCodeCacheSize=64m\ -Xss512k"
-AGP_JAR=$(find "${HOME}/.gradle/caches/modules-2/files-2.1/com.android.tools.build/builder" -name "builder-*.jar" | head -1)
+# Gradle user home can differ from $HOME in sandboxed shells — probe both.
+GRADLE_CACHE="${HOME}/.gradle/caches"
+[ -d /root/.gradle/caches ] && GRADLE_CACHE="/root/.gradle/caches"
+AGP_JAR=$(find "${GRADLE_CACHE}/modules-2/files-2.1/com.android.tools.build/builder" -name "builder-*.jar" | head -1)
 R8_JVM="-Xmx700m -XX:MaxMetaspaceSize=96m -XX:MaxDirectMemorySize=32m -XX:ReservedCodeCacheSize=32m -XX:TieredStopAtLevel=1 -Xss512k"
 DEX_OUT=app/build/intermediates/dex/release/minifyReleaseWithR8
 MAP_OUT=app/build/outputs/mapping/release
@@ -38,7 +40,14 @@ APP_CLASSES=app/build/intermediates/classes/release/transformReleaseClassesWithA
 LINT_EXCLUDES="-x :app:lintVitalRelease -x :app:lintVitalAnalyzeRelease -x :app:generateReleaseLintVitalReportModel"
 
 echo ">> 1/5 building R8 inputs (module-by-module; low-RAM chain)..."
-./gradlew :app:assembleRelease -x :app:minifyReleaseWithR8 -x :app:packageRelease $LINT_EXCLUDES $GRADLE_MEM
+# NOTE: :app:transformReleaseClassesWithAsm must be requested explicitly — with
+# minify excluded, nothing else in the graph forces the app's own release
+# classes to be compiled (R8 was their only consumer).
+# extractProguardFiles + mergeReleaseGeneratedProguardFiles must also be
+# requested explicitly: their only normal consumer is the excluded R8 task.
+./gradlew :app:assembleRelease :app:transformReleaseClassesWithAsm \
+    :app:extractProguardFiles :app:mergeReleaseGeneratedProguardFiles \
+    -x :app:minifyReleaseWithR8 -x :app:packageRelease $LINT_EXCLUDES
 
 if [ ! -f "${DEX_OUT}/classes.dex" ]; then
   echo ">> 2/5 dumping release runtime classpath via ArtifactView..."
@@ -54,11 +63,24 @@ gradle.projectsEvaluated {
     new File("/tmp/r8_runtime_cp.txt").text = view.files.files.collect { it.absolutePath }.join("\n")
 }
 EOF
-  ./gradlew -I /tmp/warrior-cpdump.init.gradle help $GRADLE_MEM -q >/dev/null 2>&1 || true
+  ./gradlew -I /tmp/warrior-cpdump.init.gradle help -q >/dev/null 2>&1 || true
 
   echo ">> 3/5 collecting app classes jar + AAR consumer ProGuard rules..."
   (cd "${APP_CLASSES}/dirs" && jar cf /tmp/warrior-app-release-classes.jar .)
-  find "${HOME}/.gradle/caches" -path "*transforms*" -name "proguard.txt" 2>/dev/null | sort -u > /tmp/r8_consumer_confs.txt
+  # Consumer rules live inside each AAR (proguard.txt at the archive root) and,
+  # when previously extracted, in the Gradle transforms cache. Union of both:
+  rm -rf /tmp/r8_aar_confs && mkdir -p /tmp/r8_aar_confs
+  find "${GRADLE_CACHE}/modules-2" -name "*.aar" 2>/dev/null | while read -r aar; do
+    unzip -p "${aar}" proguard.txt > "/tmp/r8_aar_confs/$(basename "${aar}" .aar).pro" 2>/dev/null || true
+  done
+  find /tmp/r8_aar_confs -name "*.pro" -size +0 2>/dev/null | sort -u > /tmp/r8_consumer_confs.txt
+  find "${GRADLE_CACHE}" -path "*transforms*" -name "proguard.txt" 2>/dev/null | sort -u >> /tmp/r8_consumer_confs.txt
+  CONF_COUNT=$(wc -l < /tmp/r8_consumer_confs.txt)
+  if [ "${CONF_COUNT}" -lt 5 ]; then
+    echo "FATAL: only ${CONF_COUNT} consumer rule files found — refusing to run R8 (Room/Hilt keeps would be lost)."
+    exit 1
+  fi
+  echo "   collected ${CONF_COUNT} consumer rule files"
   CONFS=""
   while read -r c; do CONFS="${CONFS} --pg-conf ${c}"; done < /tmp/r8_consumer_confs.txt
 
@@ -84,5 +106,5 @@ EOF
 fi
 
 echo ">> 5/5 packaging + signing..."
-./gradlew :app:assembleRelease -x :app:minifyReleaseWithR8 $LINT_EXCLUDES $GRADLE_MEM
+./gradlew :app:assembleRelease -x :app:minifyReleaseWithR8 $LINT_EXCLUDES
 ls -la app/build/outputs/apk/release/app-release.apk

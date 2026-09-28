@@ -16,14 +16,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.warrior.core.designsystem.components.WarriorButton
 import com.warrior.core.designsystem.components.WarriorButtonVariant
 import com.warrior.core.designsystem.components.WarriorTextField
+import com.warrior.core.designsystem.theme.Accent
 import com.warrior.core.designsystem.theme.Negative
 import com.warrior.core.designsystem.theme.TextMuted
+import com.warrior.core.designsystem.theme.TextPrimary
 import com.warrior.domain.auth.validation.AuthErrorCode
 
 @Composable
@@ -42,7 +47,17 @@ fun AuthScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(56.dp))
-        Text(stringResource(R.string.auth_wordmark), style = MaterialTheme.typography.displayLarge)
+        run {
+            val wordmark = stringResource(R.string.auth_wordmark)
+            val splitAt = (wordmark.length + 1) / 2
+            Text(
+                buildAnnotatedString {
+                    withStyle(SpanStyle(color = TextPrimary)) { append(wordmark.take(splitAt)) }
+                    withStyle(SpanStyle(color = Accent)) { append(wordmark.drop(splitAt)) }
+                },
+                style = MaterialTheme.typography.displayLarge,
+            )
+        }
         Text(
             stringResource(R.string.auth_tagline),
             style = MaterialTheme.typography.labelSmall,

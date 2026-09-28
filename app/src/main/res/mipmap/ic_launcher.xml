@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Legacy launcher icon (API 24-25): full-bleed dark tile + two-tone "W". -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:pathData="M0,0 H108 V108 H0 Z"
+        android:fillColor="#0E0E13" />
+    <path
+        android:pathData="M28,38 L41,70 L54,43"
+        android:strokeColor="#F4F4F6"
+        android:strokeWidth="8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+    <path
+        android:pathData="M54,43 L67,70 L80,38"
+        android:strokeColor="#FF4D4D"
+        android:strokeWidth="8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+</vector>

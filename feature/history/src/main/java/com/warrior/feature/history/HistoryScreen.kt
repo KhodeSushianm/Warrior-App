@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -110,7 +111,7 @@ private fun SessionRow(session: TrainingSession, showDivider: Boolean, onClick: 
             )
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
-                Text(session.rowTitle, style = MaterialTheme.typography.titleMedium)
+                Text(session.rowTitle, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(
                     stringResource(
                         R.string.history_session_meta,
@@ -120,6 +121,8 @@ private fun SessionRow(session: TrainingSession, showDivider: Boolean, onClick: 
                     ),
                     style = MaterialTheme.typography.labelSmall,
                     color = TextMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
             WarriorBadge(text = stringResource(R.string.history_intensity_badge, session.overallIntensity), highlight = true)
