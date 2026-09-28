@@ -1,7 +1,7 @@
 # گزارش فاز ۱۰ — Hardening + Release RC (گزارش پایانی پروژه)
 
 > تاریخ: ۲۰۲۶-۰۹-۲۷ | وضعیت: ✅ کامل‌شده و push‌شده روی `main` + تگ `v1.0.0`
-> سوئیت کامل: **۸۴ تست سبز** (۶۶ unit در JVM مستقل + ۱۸ Robolectric) | ktlint: سبز
+> سوئیت کامل: **۱۱۸ تست سبز** (۱۰۰ unit در JVM مستقل + ۱۸ Robolectric) | ktlint: سبز
 > خروجی: **`app-release.apk` امضاشده — ۱.۹۰MB** (R8: shrink + obfuscate کامل، از ۱۱MB دیباگ)
 > GitHub Release: تگ `v1.0.0` + فایل APK برای دانلود مستقیم
 
@@ -58,7 +58,7 @@
 | dex | ✅ ۳,۳۱۰ کلاس؛ `MainActivity`/`WarriorApplication`/`WarriorDatabase_Impl` با نام اصلی (manifest/Room reflection)؛ بقیه obfuscate شده |
 | mapping | ✅ Hilt componentها، Compose runtime، Room و ViewModelها همه حاضر |
 
-### اجرای کامل سوئیت تست‌ها (۸۴ تست، همه سبز — پس از تغییرات نهایی)
+### اجرای کامل سوئیت تست‌ها (۱۱۸ تست، همه سبز — پس از تغییرات نهایی)
 | لایه | سوئیت‌ها | تعداد |
 |---|---|---|
 | domain:auth | Validation (+codes) + UseCases (+UpdateAccount) | 18 |
@@ -88,7 +88,7 @@
 
 ## ۲. انحراف‌ها / یادداشت‌ها
 1. **بدون امولاتور**: smoke دستگاهی مانند فازهای قبل ممکن نبود؛ جایگزین = راستی‌آزمایی
-   استاتیک APK + ۸۴ تست خودکار + چک‌لیست بالا برای مالک.
+   استاتیک APK + ۱۱۸ تست خودکار + چک‌لیست بالا برای مالک.
 2. `shrinkResources=false` (فقط کد shrink می‌شود) — دلیل فنی در بالا؛ با CI پرحافظه
    در آینده یک‌خطی قابل فعال‌سازی است.
 3. keystore RC در ریپو است (تصمیم آگاهانه برای تکرارپذیری sideload) — پیش از Play

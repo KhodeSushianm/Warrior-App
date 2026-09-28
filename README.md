@@ -21,8 +21,9 @@
 | فاز ۸ — Charts + Progress Screen (نمودارهای Canvas سفارشی، heatmap، مقایسهٔ هفته‌ها) | ✅ کامل — [گزارش فاز](docs/phase-reports/08-charts-progress.md) |
 | فاز ۹ — Profile + UI Polish (ویرایش پروفایل، منابع رشتهٔ i18n-ready، حالت‌ها و ترنزیشن‌های یکدست) | ✅ کامل — [گزارش فاز](docs/phase-reports/09-profile-polish.md) |
 | فاز ۱۰ — Hardening + Release RC (R8، قانون ۱۱، MigrationTestHelper، APK امضاشده) | ✅ کامل — [گزارش فاز](docs/phase-reports/10-hardening-release.md) |
+| پس از MVP — رفع باگ‌های چیدمان + پولیش بصری + لوگوی مینیمال (v1.0.1) | ✅ کامل — [گزارش](docs/phase-reports/11-bugfix-ui-polish.md) |
 
-**MVP کامل شد.** نسخهٔ ۱.۰.۰ (RC1) از بخش [Releases](https://github.com/KhodeSushianm/Warrior-App/releases) قابل دانلود است.
+**MVP کامل شد.** آخرین نسخهٔ پایدار از بخش [Releases](https://github.com/KhodeSushianm/Warrior-App/releases) قابل دانلود است (در حال حاضر `v1.0.1`).
 
 ## بیلد
 
