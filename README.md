@@ -22,8 +22,12 @@
 | فاز ۹ — Profile + UI Polish (ویرایش پروفایل، منابع رشتهٔ i18n-ready، حالت‌ها و ترنزیشن‌های یکدست) | ✅ کامل — [گزارش فاز](docs/phase-reports/09-profile-polish.md) |
 | فاز ۱۰ — Hardening + Release RC (R8، قانون ۱۱، MigrationTestHelper، APK امضاشده) | ✅ کامل — [گزارش فاز](docs/phase-reports/10-hardening-release.md) |
 | پس از MVP — رفع باگ‌های چیدمان + پولیش بصری + لوگوی مینیمال (v1.0.1) | ✅ کامل — [گزارش](docs/phase-reports/11-bugfix-ui-polish.md) |
+| فاز ۱۲ — Schema v2 + متریک‌های بدن + Backup کامل (Export/Import) | ✅ کامل — [گزارش](docs/phase-reports/12-database-v2-body-backup.md) |
+| فاز ۱۳ — فارسی + RTL + تقویم شمسی + سوییچ زبان درون‌اپ | ✅ کامل — [گزارش](docs/phase-reports/13-persian-rtl-jalali.md) |
+| فاز ۱۴ — تایمر زندهٔ راند (Workout Mode) با ثبت خودکار Session | ✅ کامل — [گزارش](docs/phase-reports/14-live-round-timer.md) |
+| فازهای ۱۵ تا ۲۰ — هولواستت، الگوها/اهداف، تگ/جستجو، تحلیل، دستاوردها، ویجت | 🔨 طبق [نقشهٔ فصل ۲](docs/EXTENSION-PLAN.md) |
 
-**MVP کامل شد.** آخرین نسخهٔ پایدار از بخش [Releases](https://github.com/KhodeSushianm/Warrior-App/releases) قابل دانلود است (در حال حاضر `v1.0.1`).
+**MVP کامل شد.** آخرین نسخهٔ پایدار از بخش [Releases](https://github.com/KhodeSushianm/Warrior-App/releases) قابل دانلود است.
 
 ## بیلد
 
