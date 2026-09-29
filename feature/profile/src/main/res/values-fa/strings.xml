@@ -86,4 +86,8 @@
     <string name="body_error_hr">ضربان استراحت باید بین ۳۰ تا ۲۲۰ باشد</string>
     <string name="body_error_date">تاریخ نامعتبر است</string>
     <string name="body_error_unexpected">ذخیرهٔ اندازه‌گیری ناموفق بود — دوباره تلاش کنید</string>
+    <string name="body_chip_weight">وزن</string>
+    <string name="body_chip_reach">ریچ</string>
+    <string name="body_chip_hr">ضربان استراحت</string>
+    <string name="body_bmi">BMI</string>
 </resources>

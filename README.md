@@ -25,7 +25,8 @@
 | فاز ۱۲ — Schema v2 + متریک‌های بدن + Backup کامل (Export/Import) | ✅ کامل — [گزارش](docs/phase-reports/12-database-v2-body-backup.md) |
 | فاز ۱۳ — فارسی + RTL + تقویم شمسی + سوییچ زبان درون‌اپ | ✅ کامل — [گزارش](docs/phase-reports/13-persian-rtl-jalali.md) |
 | فاز ۱۴ — تایمر زندهٔ راند (Workout Mode) با ثبت خودکار Session | ✅ کامل — [گزارش](docs/phase-reports/14-live-round-timer.md) |
-| فازهای ۱۵ تا ۲۰ — هولواستت، الگوها/اهداف، تگ/جستجو، تحلیل، دستاوردها، ویجت | 🔨 طبق [نقشهٔ فصل ۲](docs/EXTENSION-PLAN.md) |
+| فاز ۱۵ — آیینهٔ دیجیتال: هولواستت شیشه‌ای بوکسور با دادهٔ مداری شبه‌3D (v1.1.0) | ✅ کامل — [گزارش](docs/phase-reports/15-hologram-athlete.md) |
+| فازهای ۱۶ تا ۲۰ — الگوها/اهداف، تگ/جستجو، تحلیل، دستاوردها، ویجت | 🔨 طبق [نقشهٔ فصل ۲](docs/EXTENSION-PLAN.md) |
 
 **MVP کامل شد.** آخرین نسخهٔ پایدار از بخش [Releases](https://github.com/KhodeSushianm/Warrior-App/releases) قابل دانلود است.
 

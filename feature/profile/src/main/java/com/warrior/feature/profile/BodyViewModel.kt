@@ -43,6 +43,7 @@ class BodyViewModel @Inject constructor(
         val metrics: List<BodyMetric> = emptyList(),
         val latest: BodyMetric? = null,
         val previousWeightKg: Float? = null,
+        val bmi: Float? = null,
         val trendPoints: List<Float> = emptyList(),
         val showDialog: Boolean = false,
         val weightText: String = "",
@@ -72,6 +73,7 @@ class BodyViewModel @Inject constructor(
                             metrics = list,
                             latest = list.firstOrNull(),
                             previousWeightKg = list.getOrNull(1)?.weightKg,
+                            bmi = computeBmi(list),
                             trendPoints = trendPoints(chronological.map { m -> m.weightKg }),
                         )
                     }
@@ -139,6 +141,15 @@ class BodyViewModel @Inject constructor(
         val text = trim().replace(',', '.')
         if (text.isEmpty()) return null
         return text.toFloatOrNull() ?: Float.NaN // NaN fails range validation -> code surfaced
+    }
+
+    /** BMI = kg / m² from the latest weight and the latest known height (pure, testable). */
+    private fun computeBmi(metrics: List<BodyMetric>): Float? {
+        val weight = metrics.firstOrNull()?.weightKg ?: return null
+        val heightCm = metrics.firstOrNull { it.heightCm != null }?.heightCm ?: return null
+        if (heightCm <= 0f) return null
+        val meters = heightCm / 100f
+        return weight / (meters * meters)
     }
 
     private fun trendPoints(weights: List<Float>): List<Float> {

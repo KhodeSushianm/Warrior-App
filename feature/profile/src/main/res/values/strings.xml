@@ -90,4 +90,8 @@
     <string name="body_error_hr">Resting heart rate must be between 30 and 220 bpm</string>
     <string name="body_error_date">The date is invalid</string>
     <string name="body_error_unexpected">Could not save the measurement — please try again</string>
+    <string name="body_chip_weight">Weight</string>
+    <string name="body_chip_reach">Reach</string>
+    <string name="body_chip_hr">Rest HR</string>
+    <string name="body_bmi">BMI</string>
 </resources>

@@ -20,12 +20,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.warrior.core.common.time.DateFormats
+import com.warrior.core.designsystem.components.HoloAnchor
+import com.warrior.core.designsystem.components.HoloStat
+import com.warrior.core.designsystem.components.HologramAthlete
 import com.warrior.core.designsystem.components.WarriorButton
 import com.warrior.core.designsystem.components.WarriorCard
 import com.warrior.core.designsystem.components.WarriorEmptyState
@@ -43,9 +47,9 @@ import com.warrior.domain.progress.model.BodyMetric
 import java.util.Locale
 
 /**
- * Athlete body screen (Season 2 / Phase 12): current weight hero with trend,
- * key measurements, history and the add-measurement dialog. The 3D glass-boxer
- * visualization of this data arrives in Phase 18 on the same screen family.
+ * Athlete body screen (Season 2): the Phase 15 digital glass boxer with
+ * orbiting stats as the hero, above the weight trend, key measurements,
+ * history and the add-measurement dialog (Phase 12).
  */
 @Composable
 fun BodyScreen(
@@ -77,6 +81,11 @@ fun BodyScreen(
         when {
             !state.loaded -> WarriorLoadingBox()
             state.metrics.isEmpty() -> {
+                // The athlete still renders — an empty stage invites the first entry.
+                WarriorCard(contentPadding = 10.dp) {
+                    HologramAthlete(stats = emptyList(), modifier = Modifier.height(260.dp))
+                }
+                Spacer(Modifier.height(12.dp))
                 WarriorCard {
                     WarriorEmptyState(
                         title = stringResource(R.string.body_empty_title),
@@ -118,6 +127,17 @@ fun BodyScreen(
 @Composable
 private fun BodyContent(state: BodyViewModel.UiState, viewModel: BodyViewModel) {
     val latest = state.latest ?: return
+
+    // Phase 15 hero: the digital glass athlete with orbiting body stats.
+    WarriorCard(
+        contentPadding = 10.dp,
+        brush = androidx.compose.ui.graphics.Brush.linearGradient(
+            listOf(Color(0x14BFE9FF), Color(0x00BFE9FF)),
+        ),
+    ) {
+        HologramAthlete(stats = holoStats(state))
+    }
+    Spacer(Modifier.height(16.dp))
 
     // Hero: current weight + change vs previous measurement.
     WarriorCard(
@@ -355,6 +375,38 @@ private val BodyErrorCode.labelRes: Int
         BodyErrorCode.INVALID_DATE -> R.string.body_error_date
         BodyErrorCode.UNEXPECTED -> R.string.body_error_unexpected
     }
+
+/** Maps the latest known metrics (+derived BMI) onto orbiting chips. */
+@Composable
+private fun holoStats(state: BodyViewModel.UiState): List<HoloStat> {
+    val latest = state.latest ?: return emptyList()
+    val weightLabel = stringResource(R.string.body_chip_weight)
+    val kg = stringResource(R.string.body_unit_kg)
+    val heightLabel = stringResource(R.string.body_height)
+    val reachLabel = stringResource(R.string.body_chip_reach)
+    val fatLabel = stringResource(R.string.body_bodyfat)
+    val hrLabel = stringResource(R.string.body_chip_hr)
+    val bmiLabel = stringResource(R.string.body_bmi)
+    val metrics = state.metrics
+    return buildList {
+        add(HoloStat(weightLabel, "${formatKg(latest.weightKg)} $kg", HoloAnchor.WAIST))
+        latestNonNull(metrics) { it.heightCm }?.let {
+            add(HoloStat(heightLabel, String.format(Locale.ENGLISH, "%.0f cm", it), HoloAnchor.HEAD))
+        }
+        latestNonNull(metrics) { it.reachCm }?.let {
+            add(HoloStat(reachLabel, String.format(Locale.ENGLISH, "%.0f cm", it), HoloAnchor.ARMS))
+        }
+        latestNonNull(metrics) { it.bodyFatPercent }?.let {
+            add(HoloStat(fatLabel, String.format(Locale.ENGLISH, "%.1f%%", it), HoloAnchor.WAIST))
+        }
+        latestNonNull(metrics) { it.restingHeartRate }?.let {
+            add(HoloStat(hrLabel, "$it bpm", HoloAnchor.CHEST))
+        }
+        state.bmi?.let {
+            add(HoloStat(bmiLabel, String.format(Locale.ENGLISH, "%.1f", it), HoloAnchor.CHEST))
+        }
+    }
+}
 
 private fun formatKg(value: Float): String = String.format(Locale.ENGLISH, "%.1f", value)
 

@@ -19,6 +19,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -180,5 +181,30 @@ class BodyViewModelTest {
         override suspend fun clear() {
             state.value = null
         }
+    }
+
+    @Test
+    fun bmi_derivedFromLatestWeightAndLatestKnownHeight() = runTest {
+        session.start(1)
+        val viewModel = buildViewModel()
+
+        // No height recorded yet -> no BMI.
+        viewModel.onAddOpen()
+        viewModel.onWeightChange("80")
+        viewModel.onSave()
+        assertNull(viewModel.state.value.bmi)
+
+        // Height enters the history -> BMI = 77 / 1.80^2.
+        viewModel.onAddOpen()
+        viewModel.onWeightChange("77")
+        viewModel.onHeightChange("180")
+        viewModel.onSave()
+        assertEquals(77f / (1.8f * 1.8f), viewModel.state.value.bmi!!, 0.01f)
+
+        // A later weight-only measurement reuses the latest known height.
+        viewModel.onAddOpen()
+        viewModel.onWeightChange("75")
+        viewModel.onSave()
+        assertEquals(75f / (1.8f * 1.8f), viewModel.state.value.bmi!!, 0.01f)
     }
 }
