@@ -84,3 +84,21 @@
   KSP1 + Room 2.6.1 + hilt aggregating پیش‌فرض + strategy=daemon با
   kotlin daemon ≈480m/SerialGC/ActiveProcessorCount=1 و daemon گریدل ≈320m/256m
   (به‌همراه kill کردن JVMهای زامبی و `sync` پیش از هر اجرا).
+
+### وضعیت انتشار v1.1.1 (نهایی)
+- **APK ریلیز امضاشده ۸.۶۹MB** منتشر شد (بدون minify — دلیل پایین‌تر).
+- SHA-256: `86ba809a605dc9c254d5bb8611de0dc1cfb51801c4aeeee21521bb10354d8158`
+- راستی‌آزمایی: apksigner (همان کلید RC) · badging (v1.1.1/code 4) · dex: هر دو dex
+  شامل همهٔ ماژول‌ها + `WarriorDatabase_Impl`/`Hilt_MainActivity`/`HologramAthleteKt` ·
+  asset وب‌پ هولواستت داخل APK.
+- **چرا بدون minify؟** R8 روی گراف کامل در این sandbox (۱GiB) جا نمی‌شود
+  (کرش کرنل در ۵۱۲ تا ۷۰۰MB هیپ، حتی به‌صورت فرآیند مستقل). `isMinifyEnabled`
+  اکنون با متغیر محیطی `WARRIOR_MINIFY=1` گیت شده؛ بیلد R8-شده برای ماشین‌های
+  ≥۴GB و CI فاز ۲۰ با همان مسیر `build-release.sh` در دسترس است.
+- **زنجیرهٔ بیلد sandbox (اسکریپت v3)**: kotlinc مستقل برای ماژول app (کامپایل سرد
+  اپ در daemon ممکن نیست) → javac/transform/dexBuilder در Gradle با
+  `onlyIf{false}` روی compileReleaseKotlin/minify → D8 مستقل برای ext-dex و
+  merge نهایی با **لیست دقیق ورودی‌های mergeDexRelease** → بسته‌بندی و امضا.
+  درس‌های ثبت‌شده: KSP1 برای Room (KSP2 با Room 2.6.1 سازگار نیست)،
+  `hilt.enableAggregatingTask=false` برای عبور از دیوارهٔ حافظهٔ KSP سرد،
+  kill کردن JVMهای زامبی + sync پیش از هر گام سنگین.

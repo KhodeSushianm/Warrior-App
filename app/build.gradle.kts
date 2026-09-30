@@ -41,10 +41,12 @@ android {
         // lives in :data:local's own BuildConfig — debug-only there; release
         // builds fail loudly on a missing migration instead of wiping data.
         release {
-            isMinifyEnabled = true
-            // Resource shrinking needs AGP's internal R8 -printresources wiring,
-            // which the standalone-R8 low-RAM flow (scripts/build-release.sh)
-            // cannot reproduce; code shrinking + obfuscation stay ON.
+            // Sandbox note (Phase 15 revision): R8 over the full graph needs
+            // ~700MB+ heap which the 1GiB CI sandbox cannot give; releases built
+            // via scripts/build-release.sh ship un-minified for now. The
+            // standalone-R8 path stays in the script (WARRIOR_MINIFY=1) for
+            // machines with >=4GB RAM / future CI (Phase 20).
+            isMinifyEnabled = providers.environmentVariable("WARRIOR_MINIFY").orNull == "1"
             isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
@@ -68,7 +70,7 @@ tasks.withType<JavaCompile>().configureEach {
     // 1GiB sandbox: Hilt-generated sources spike metaspace beyond the cgroup
     // limit when javac runs in-process; fork it into its own small JVM.
     options.isFork = true
-    options.forkOptions.memoryMaximumSize = "420m"
+    options.forkOptions.memoryMaximumSize = "320m"
 }
 
 dependencies {
