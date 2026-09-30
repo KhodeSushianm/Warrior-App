@@ -17,8 +17,8 @@ android {
         applicationId = "com.warrior.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.1.0"
+        versionCode = 4
+        versionName = "1.1.1"
     }
 
     signingConfigs {
@@ -62,6 +62,13 @@ android {
         compose = true
         buildConfig = true
     }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    // 1GiB sandbox: Hilt-generated sources spike metaspace beyond the cgroup
+    // limit when javac runs in-process; fork it into its own small JVM.
+    options.isFork = true
+    options.forkOptions.memoryMaximumSize = "420m"
 }
 
 dependencies {

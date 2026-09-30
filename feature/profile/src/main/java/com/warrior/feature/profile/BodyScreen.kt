@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -83,7 +84,11 @@ fun BodyScreen(
             state.metrics.isEmpty() -> {
                 // The athlete still renders — an empty stage invites the first entry.
                 WarriorCard(contentPadding = 10.dp) {
-                    HologramAthlete(stats = emptyList(), modifier = Modifier.height(260.dp))
+                    HologramAthlete(
+                        stats = emptyList(),
+                        figure = painterResource(R.drawable.athlete_hologram),
+                        modifier = Modifier.height(280.dp),
+                    )
                 }
                 Spacer(Modifier.height(12.dp))
                 WarriorCard {
@@ -135,7 +140,10 @@ private fun BodyContent(state: BodyViewModel.UiState, viewModel: BodyViewModel) 
             listOf(Color(0x14BFE9FF), Color(0x00BFE9FF)),
         ),
     ) {
-        HologramAthlete(stats = holoStats(state))
+        HologramAthlete(
+            stats = holoStats(state),
+            figure = painterResource(R.drawable.athlete_hologram),
+        )
     }
     Spacer(Modifier.height(16.dp))
 
